@@ -46,7 +46,7 @@ card = {
                 "inlines": [
                     {
                         "type": "TextRun",
-                        "text": "The next FUSE session is on February 17th. It doesn't look like you have accepted the invitation. Your acceptance is used to pair you with a fellow SE. But we know sometimes Outlook doesn't properly update your response. So, let us know if you plan on attending.",
+                        "text": "The next FUSE session is a few days away. It doesn't look like you have accepted the invitation. Your acceptance is used to pair you with a fellow SE. But we know sometimes Outlook doesn't properly update your response. So, let us know if you plan on attending.",
                     }
                 ],
                 "id": "fyi",

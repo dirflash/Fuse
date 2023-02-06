@@ -3,7 +3,7 @@
 import os
 import sys
 import pandas as pd
-from webex_local import msg
+from webex_local import msg, check_mgr
 
 attend_csv = "./230210 - FUSE.csv"
 noncommit_tst = []
@@ -51,6 +51,8 @@ def responses(dframe):
     print(f"Not responded: {len(no_respond)}")
     return no_respond
 
+
+check_mgr.mgr()
 
 try:
     df = pd.read_csv(attend_csv, header=0)
