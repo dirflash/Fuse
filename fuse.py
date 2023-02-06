@@ -1,4 +1,4 @@
-# fuse bot
+# fuse bot - under construction
 
 import os
 import sys
