@@ -1,4 +1,4 @@
-# fuse
+# fuse bot
 
 import os
 import sys
