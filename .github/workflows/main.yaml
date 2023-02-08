@@ -17,7 +17,7 @@ jobs:
           token: ${{ secrets. PAT }}
           repository: dirflash/Fuse
           event-type: FUSE_Run
-          client-payload: '{"attachment": "${{ github.attachment }}"}'
+          client-payload: '{"attachment": ${{ github.attachment }}}'
       - name: checkout repo content
         uses: actions/checkout@v2
       - name: setup python
