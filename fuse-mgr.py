@@ -3,9 +3,20 @@
 import os
 import sys
 import pandas as pd
-from webex_local import msg
+from webex_local import msg, check_mgr
 
 attend_csv = "./230210 - FUSE.csv"
+
+
+KEY = "CI"
+if os.getenv(KEY):
+    webex_bearer = os.environ["WEBEX_BEARER"]
+    attachment = os.environ["attachment"]
+    room_id = os.environ["room_id"]
+    room_type = os.environ["room_type"]
+    person_id = os.environ["person_id"]
+    person_email = os.environ["person_email"]
+
 noncommit_tst = []
 
 
@@ -52,6 +63,16 @@ def responses(dframe):
     return no_respond
 
 
+print(webex_bearer)
+print(attachment)
+print(room_id)
+print(room_type)
+print(person_id)
+print(person_email)
+
+"""
+# check_mgr.mgr()
+
 try:
     df = pd.read_csv(attend_csv, header=0)
     print(f"Found file: {os.path.basename(attend_csv)}")
@@ -62,6 +83,7 @@ df1 = alias_format(df)
 df2 = x_dups(df1)
 # dfo, dfx, opt = organizer(df2)
 no_resp = responses(df2)
+"""
 
 """
 print(no_resp[["Full Name", "Alias", "Attendance", "Response"]].head())
@@ -87,6 +109,7 @@ print(f"Declined Attendees ({len(declined)}):")
 # print(declined[["Full Name", "Alias", "Attendance", "Response"]].head())
 """
 
+"""
 noncommited = df2[
     (df2["Response"] == "None") & (df2["Attendance"] == "Required Attendee")
 ]
@@ -99,3 +122,4 @@ print(noncommit_lst)
 noncommit_tst.append("aarodavi")
 
 msg.msg(noncommit_tst)
+"""

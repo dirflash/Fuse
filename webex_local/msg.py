@@ -88,7 +88,6 @@ def send_msg(x):
 def msg(alias):
     for x in alias:
         email = f"{x}@cisco.com"
-        print(email)
         if email == "aarodavi@cisco.com":
             try:
                 # response = requests.request("POST", url, headers=headers, data=payload, timeout=2)
