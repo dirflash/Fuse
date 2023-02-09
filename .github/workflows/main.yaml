@@ -44,4 +44,5 @@ jobs:
           person_id: ${{ github.person_id }}
           person_email: ${{ github.person_email }}
         run: |
+          echo ${{ secrets.WEBEX_BEARER }}
           python fuse-mgr.py
