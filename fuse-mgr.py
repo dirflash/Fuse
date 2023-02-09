@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+import pandas
 
 print("Hello World!")
 
@@ -39,3 +40,8 @@ get_attach_response.raise_for_status()
 print(f"Message sent ({get_attach_response.status_code})")
 
 print(get_attach_response.text)
+
+attach_response = get_attach_response.json()
+
+df = pandas.DataFrame(attach_response)
+print(df.head())
