@@ -34,12 +34,7 @@ post_msg_r = requests.request(
 post_msg_r.raise_for_status()
 print(f"Message sent ({post_msg_r.status_code})")
 
-
-get_attach_url = "https://webexapis.com/v1/contents/" + attachment
-
-get_attach_response = requests.request(
-    "GET", get_attach_url, headers=headers, timeout=2
-)
+get_attach_response = requests.request("GET", attachment, headers=headers, timeout=2)
 get_attach_response.raise_for_status()
 print(f"Message sent ({get_attach_response.status_code})")
 
