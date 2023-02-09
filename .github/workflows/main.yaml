@@ -15,11 +15,9 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.PAT }}
-          attachment: ${{ github.event.client_payload.attachment}}
-          room_id: ${{ github.event.client_payload.room_id }}
-          room_type: ${{ github.event.client_payload.room_type }}
-          person_id: ${{ github.event.client_payload.person_id }}
-          person_email: ${{ github.event.client_payload.person_email }}
+          repository: dirflash/Fuse
+          event-type: my-event
+          client-payload: '{"attachment": "${{ github.attachment}}", "room-id": "${{ github.room-id }}", "room-type": "${{ github.room-type }}", "person_id": "${{ github.person_id }}", "person_email": "${{ github.person_email }}"}'
       - name: checkout repo content
         uses: actions/checkout@v3
       - name: setup python
