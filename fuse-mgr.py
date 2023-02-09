@@ -10,7 +10,7 @@ room_type = os.environ["room_type"]
 person_id = os.environ["person_id"]
 person_email = os.environ["person_email"]
 
-print(env_webex_bearer)
+print(webex_bearer)
 print(webex_bearer)
 print(attachment)
 print(room_id)
