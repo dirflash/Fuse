@@ -3,7 +3,6 @@
 import os
 import sys
 import pandas as pd
-from webex_local import msg, check_mgr
 
 attend_csv = "./230210 - FUSE.csv"
 
@@ -18,6 +17,13 @@ if os.getenv(KEY):
     person_email = os.environ["person_email"]
 
 noncommit_tst = []
+
+print(webex_bearer)
+print(attachment)
+print(room_id)
+print(room_type)
+print(person_id)
+print(person_email)
 
 
 def alias_format(dframe):
@@ -62,13 +68,6 @@ def responses(dframe):
     print(f"Not responded: {len(no_respond)}")
     return no_respond
 
-
-print(webex_bearer)
-print(attachment)
-print(room_id)
-print(room_type)
-print(person_id)
-print(person_email)
 
 """
 # check_mgr.mgr()
