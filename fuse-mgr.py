@@ -2,7 +2,7 @@ import os
 
 print("Hello World!")
 
-env_webex_bearer = os.environ["env_webex_bearer"]
+webex_bearer = os.environ["webex_bearer"]
 webex_bearer = os.environ["webex_bearer"]
 attachment = os.environ["attachment"]
 room_id = os.environ["room_id"]
