@@ -30,7 +30,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install --upgrade --upgrade-strategy eager -r requirements.txt; fi
       - name: execute py script # run file
         env:
-          webex_bearer: ${{ secrets.WEBEX_BEARER }}
+          webex_bearer: ${{ secrets.ENV.WEBEX_BEARER }}
           attachment: ${{ github.event.client_payload.attachment }}
           room_id: ${{ github.event.client_payload.room_id }}
           room_type: ${{ github.event.client_payload.room_type }}
