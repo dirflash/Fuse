@@ -12,14 +12,14 @@ person_id = os.environ["person_id"]
 person_email = os.environ["person_email"]
 
 
-url = "https://webexapis.com/v1/messages/"
+post_msg = "https://webexapis.com/v1/messages/"
 
 headers = {
     "Authorization": webex_bearer,
     "Content-Type": "application/json",
 }
 
-message = "Attachement ID: " + attachment + " from " + person_id
+message = "Attachment ID: " + attachment + " from " + person_id
 
 payload = json.dumps(
     {
@@ -28,6 +28,19 @@ payload = json.dumps(
     }
 )
 print(payload)
-r = requests.request("POST", url, headers=headers, data=payload, timeout=2)
-r.raise_for_status()
-print(f"Message sent ({r.status_code})")
+post_msg_r = requests.request(
+    "POST", post_msg, headers=headers, data=payload, timeout=2
+)
+post_msg_r.raise_for_status()
+print(f"Message sent ({post_msg_r.status_code})")
+
+
+get_attach_url = "https://webexapis.com/v1/contents/" + attachment
+
+get_attach_response = requests.request(
+    "GET", get_attach_url, headers=headers, timeout=2
+)
+get_attach_response.raise_for_status()
+print(f"Message sent ({get_attach_response.status_code})")
+
+print(get_attach_response.text)
