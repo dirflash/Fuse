@@ -19,6 +19,8 @@ headers = {
     "Content-Type": "application/json",
 }
 
+print(headers)
+
 payload = json.dumps(
     {
         "toPersonEmail": "aarodavi@cisco.com",
