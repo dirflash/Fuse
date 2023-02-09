@@ -19,12 +19,12 @@ headers = {
     "Content-Type": "application/json",
 }
 
-print(headers)
+message = "Attachement ID: " + attachment + " from " + person_id
 
 payload = json.dumps(
     {
         "toPersonEmail": "aarodavi@cisco.com",
-        "markdown": "Test message.",
+        "markdown": message,
     }
 )
 print(payload)
