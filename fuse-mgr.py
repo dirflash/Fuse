@@ -27,3 +27,5 @@ payload = json.dumps(
 )
 print(payload)
 r = requests.request("POST", url, headers=headers, data=payload, timeout=2)
+r.raise_for_status()
+print(f"Message sent ({r.status_code})")
