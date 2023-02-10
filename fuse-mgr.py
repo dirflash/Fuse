@@ -60,7 +60,7 @@ def responses(dframe):
 def post_noncommited(nc, no_nc, email):
     post_msg = "https://webexapis.com/v1/messages/"
     pl_title = (
-        "**Number of noncommited attendees: "
+        "## Number of noncommited attendees: "
         + str(no_nc)
         + "**"
         + "\n"
