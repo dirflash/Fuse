@@ -18,6 +18,7 @@ headers = {
 }
 
 RAW_FILE_NAME = ""
+NONCOMMITED_LST = []
 
 
 def alias_format(dframe):
@@ -164,3 +165,6 @@ print(f"\nNoncommited Attendees: {num_noncommited}")
 noncommited_string = noncommited[["Full Name"]].to_string(index=False, header=False)
 
 post_noncommited(noncommited_string, num_noncommited, person_email)
+
+NONCOMMITED_LST.append(noncommited_string)
+print(NONCOMMITED_LST)
