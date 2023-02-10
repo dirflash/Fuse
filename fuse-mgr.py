@@ -62,7 +62,7 @@ def post_noncommited(nc, no_nc, email):
     pl_title = (
         "## Number of noncommited attendees: "
         + str(no_nc)
-        + "\n"
+        + " \n"
         + nc
         + "\n\n### Sending reminders."
     )
