@@ -59,7 +59,14 @@ def responses(dframe):
 
 def post_noncommited(nc, no_nc, email):
     post_msg = "https://webexapis.com/v1/messages/"
-    pl_title = "**Number of noncommited attendees: " + str(no_nc) + "**" + "\n" + nc
+    pl_title = (
+        "**Number of noncommited attendees: "
+        + str(no_nc)
+        + "**"
+        + "\n"
+        + nc
+        + "\nSending reminders."
+    )
     payload = json.dumps(
         {
             "toPersonEmail": email,
@@ -166,5 +173,5 @@ noncommited_string = noncommited[["Full Name"]].to_string(index=False, header=Fa
 
 post_noncommited(noncommited_string, num_noncommited, person_email)
 
-NONCOMMITED_LST = list(noncommited[["Alias"]])
+NONCOMMITED_LST = noncommited["Alias"].values.tolist()
 print(NONCOMMITED_LST)
