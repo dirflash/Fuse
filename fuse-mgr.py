@@ -12,8 +12,6 @@ person_id = os.environ["person_id"]
 person_email = os.environ["person_email"]
 auth_mgrs = os.environ["auth_mgrs"]
 
-print(auth_mgrs)
-
 headers = {
     "Authorization": webex_bearer,
     "Content-Type": "application/json",
@@ -82,6 +80,38 @@ def post_noncommited(nc, no_nc, email):
     except requests.exceptions.RequestException as nc_cat_exception:
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
+
+def not_authd_mgr(email):
+    post_msg = "https://webexapis.com/v1/messages/"
+    pl_title = "**You don't appear to be an authorized manager of this bot.**"
+    payload = json.dumps(
+        {
+            "toPersonEmail": email,
+            "markdown": pl_title,
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg, headers=headers, data=payload, timeout=2
+        )
+        post_msg_r.raise_for_status()
+        print(f"Noncommited List Message sent ({post_msg_r.status_code})")
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
+if person_email in auth_mgrs:
+    print("Authorized manager.")
+else:
+    print("Not an authorized manager.")
+    not_authd_mgr(person_email)
+    sys.exit()
 
 try:
     # get file attachment
