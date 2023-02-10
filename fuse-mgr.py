@@ -166,5 +166,5 @@ noncommited_string = noncommited[["Full Name"]].to_string(index=False, header=Fa
 
 post_noncommited(noncommited_string, num_noncommited, person_email)
 
-NONCOMMITED_LST.append(noncommited_string)
+NONCOMMITED_LST = list(noncommited[["Alias"]])
 print(NONCOMMITED_LST)
