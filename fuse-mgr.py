@@ -2,9 +2,7 @@ import os
 import sys
 import requests
 import json
-import csv
 import pandas as pd
-import configparser
 
 webex_bearer = os.environ["webex_bearer"]
 attachment = os.environ["attachment"]
@@ -12,6 +10,9 @@ room_id = os.environ["room_id"]
 room_type = os.environ["room_type"]
 person_id = os.environ["person_id"]
 person_email = os.environ["person_email"]
+auth_mgrs = os.environ["auth_mgrs"]
+
+print(auth_mgrs)
 
 headers = {
     "Authorization": webex_bearer,
