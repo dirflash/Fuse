@@ -65,7 +65,7 @@ def post_noncommited(nc, no_nc, email):
         + "**"
         + "\n"
         + nc
-        + "\nSending reminders."
+        + "\n\n**Sending reminders.**"
     )
     payload = json.dumps(
         {
