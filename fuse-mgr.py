@@ -95,7 +95,7 @@ def not_authd_mgr(email):
             "POST", post_msg, headers=headers, data=payload, timeout=2
         )
         post_msg_r.raise_for_status()
-        print(f"Noncommited List Message sent ({post_msg_r.status_code})")
+        print(f"Not Authorized Manager Message sent ({post_msg_r.status_code})")
     except requests.exceptions.Timeout:
         print("Timeout error. Try again.")
     except requests.exceptions.TooManyRedirects:
