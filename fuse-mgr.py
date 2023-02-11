@@ -100,6 +100,7 @@ mgr_card = {
                                         "id": "send_remind",
                                     }
                                 ],
+                                "id": "send_reminder",
                             }
                         ],
                     },
