@@ -93,6 +93,7 @@ mgr_card = {
                         "items": [
                             {
                                 "type": "ActionSet",
+                                "id": "send_reminder",
                                 "actions": [
                                     {
                                         "type": "Action.Submit",
@@ -100,7 +101,6 @@ mgr_card = {
                                         "id": "send_remind",
                                     }
                                 ],
-                                "id": "send_reminder",
                             }
                         ],
                     },
