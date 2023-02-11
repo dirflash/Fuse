@@ -106,37 +106,6 @@ mgr_card = {
                     {
                         "type": "Column",
                         "width": "stretch",
-                        "items": [
-                            {
-                                "type": "ActionSet",
-                                "actions": [
-                                    {
-                                        "type": "Action.ShowCard",
-                                        "title": "Send Survey",
-                                        "card": {
-                                            "type": "AdaptiveCard",
-                                            "body": [
-                                                {
-                                                    "type": "Input.Text",
-                                                    "placeholder": "Survey Link",
-                                                    "id": "survey_link",
-                                                },
-                                                {
-                                                    "type": "ActionSet",
-                                                    "actions": [
-                                                        {
-                                                            "type": "Action.Submit",
-                                                            "title": "Submit",
-                                                            "id": "survey_submit",
-                                                        }
-                                                    ],
-                                                },
-                                            ],
-                                        },
-                                        "id": "survey_card",
-                                    }
-                                ],
-                            }
                         ],
                     },
                 ],
