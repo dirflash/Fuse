@@ -12,6 +12,8 @@ person_id = os.environ["person_id"]
 person_email = os.environ["person_email"]
 auth_mgrs = os.environ["auth_mgrs"]
 
+post_msg_url = "https://webexapis.com/v1/messages/"
+
 headers = {
     "Authorization": webex_bearer,
     "Content-Type": "application/json",
@@ -19,6 +21,130 @@ headers = {
 
 RAW_FILE_NAME = ""
 NONCOMMITED_LST = []
+
+mgr_card = {
+    "contentType": "application/vnd.microsoft.card.adaptive",
+    "content": {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "ColumnSet",
+                "columns": [
+                    {
+                        "type": "Column",
+                        "items": [
+                            {
+                                "type": "Image",
+                                "style": "Person",
+                                "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                                "size": "Medium",
+                                "height": "100px",
+                                "width": "400px",
+                            }
+                        ],
+                        "width": "auto",
+                    }
+                ],
+            },
+            {
+                "type": "ColumnSet",
+                "columns": [
+                    {
+                        "type": "Column",
+                        "width": 65,
+                        "items": [
+                            {
+                                "type": "TextBlock",
+                                "text": "Fuse Bot Mission Control",
+                                "weight": "Bolder",
+                                "color": "Default",
+                                "size": "Large",
+                                "fontType": "Monospace",
+                            }
+                        ],
+                    }
+                ],
+                "spacing": "Padding",
+                "horizontalAlignment": "Center",
+            },
+            {
+                "type": "ColumnSet",
+                "columns": [
+                    {
+                        "type": "Column",
+                        "width": "stretch",
+                        "items": [
+                            {
+                                "type": "ActionSet",
+                                "actions": [
+                                    {
+                                        "type": "Action.Submit",
+                                        "title": "Attendee Report",
+                                        "id": "attendee_report",
+                                    }
+                                ],
+                            }
+                        ],
+                    },
+                    {
+                        "type": "Column",
+                        "width": "stretch",
+                        "items": [
+                            {
+                                "type": "ActionSet",
+                                "actions": [
+                                    {
+                                        "type": "Action.Submit",
+                                        "title": "Send Reminders",
+                                        "id": "send_remind",
+                                    }
+                                ],
+                            }
+                        ],
+                    },
+                    {
+                        "type": "Column",
+                        "width": "stretch",
+                        "items": [
+                            {
+                                "type": "ActionSet",
+                                "actions": [
+                                    {
+                                        "type": "Action.ShowCard",
+                                        "title": "Send Survey",
+                                        "card": {
+                                            "type": "AdaptiveCard",
+                                            "body": [
+                                                {
+                                                    "type": "Input.Text",
+                                                    "placeholder": "Survey Link",
+                                                    "id": "survey_link",
+                                                },
+                                                {
+                                                    "type": "ActionSet",
+                                                    "actions": [
+                                                        {
+                                                            "type": "Action.Submit",
+                                                            "title": "Submit",
+                                                            "id": "survey_submit",
+                                                        }
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                        "id": "survey_card",
+                                    }
+                                ],
+                            }
+                        ],
+                    },
+                ],
+            },
+        ],
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "version": "1.2",
+    },
+}
 
 
 def alias_format(dframe):
@@ -62,7 +188,7 @@ def post_noncommited(nc, no_nc, email):
     pl_title = (
         "## Number of noncommited attendees: "
         + str(no_nc)
-        + " \n "
+        + "---"
         + nc
         + "\n\n### Sending reminders."
     )
@@ -111,6 +237,19 @@ def not_authd_mgr(email):
         raise SystemExit(nc_err) from nc_err
     except requests.exceptions.RequestException as nc_cat_exception:
         raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
+def mgr_control():
+    payload = json.dumps(
+        {
+            "toPersonEmail": person_email,
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": mgr_card,
+        }
+    )
+    print(payload)
+    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
+    return r
 
 
 if person_email in auth_mgrs:
@@ -162,6 +301,7 @@ except OSError as e:
 df1 = alias_format(df)
 df2 = x_dups(df1)
 no_resp = responses(df2)
+mgr_ctl_response = mgr_control()
 
 noncommited = df2[
     (df2["Response"] == "None") & (df2["Attendance"] == "Required Attendee")
