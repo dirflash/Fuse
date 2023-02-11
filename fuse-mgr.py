@@ -102,11 +102,8 @@ mgr_card = {
                                 ],
                             }
                         ],
-                    },
-                    {
                         "type": "Column",
                         "width": "stretch",
-                        ],
                     },
                 ],
             },
