@@ -60,6 +60,7 @@ mgr_card = {
                                 "color": "Default",
                                 "size": "Large",
                                 "fontType": "Monospace",
+                                "horizontalAlignment": "Center",
                             }
                         ],
                     }
@@ -188,7 +189,7 @@ def post_noncommited(nc, no_nc, email):
     pl_title = (
         "## Number of noncommited attendees: "
         + str(no_nc)
-        + "---"
+        + "\n---\n"
         + nc
         + "\n\n### Sending reminders."
     )
@@ -216,7 +217,7 @@ def post_noncommited(nc, no_nc, email):
 
 def not_authd_mgr(email):
     post_msg = "https://webexapis.com/v1/messages/"
-    pl_title = "**You don't appear to be an authorized manager of this bot.**"
+    pl_title = "**You don't appear to be an authorized manager of this bot. Mamma told me not to talk to strangers.**"
     payload = json.dumps(
         {
             "toPersonEmail": email,
@@ -303,6 +304,7 @@ df2 = x_dups(df1)
 no_resp = responses(df2)
 mgr_ctl_response = mgr_control()
 
+"""
 noncommited = df2[
     (df2["Response"] == "None") & (df2["Attendance"] == "Required Attendee")
 ]
@@ -313,3 +315,4 @@ noncommited_string = noncommited[["Full Name"]].to_string(index=False, header=Fa
 post_noncommited(noncommited_string, num_noncommited, person_email)
 
 NONCOMMITED_LST = noncommited["Alias"].values.tolist()
+"""
