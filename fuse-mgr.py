@@ -76,19 +76,63 @@ mgr_card = {
                         "width": "stretch",
                         "items": [
                             {
+                                "type": "TextBlock",
+                                "text": "What can I do for you?",
+                                "wrap": True,
+                            }
+                        ],
+                    },
+                    {
+                        "type": "Column",
+                        "width": "stretch",
+                        "items": [
+                            {
+                                "type": "Input.ChoiceSet",
+                                "choices": [
+                                    {
+                                        "title": "Attendee Report",
+                                        "value": "attend_report",
+                                    },
+                                    {
+                                        "title": "Send Nudge",
+                                        "value": "noncomit_reminders",
+                                    },
+                                    {
+                                        "title": "Pre FUSE Reminder",
+                                        "value": "pre_reminder",
+                                    },
+                                    {
+                                        "title": "Send Survey Message",
+                                        "value": "survey_msg",
+                                    },
+                                ],
+                                "id": "Action_Choice",
+                            }
+                        ],
+                    },
+                ],
+            },
+            {
+                "type": "ColumnSet",
+                "columns": [
+                    {"type": "Column", "width": "stretch", "isVisible": False},
+                    {
+                        "type": "Column",
+                        "width": "stretch",
+                        "items": [
+                            {
                                 "type": "ActionSet",
                                 "actions": [
                                     {
                                         "type": "Action.Submit",
-                                        "title": "Attendee Report",
-                                        "id": "attend_report",
+                                        "title": "Submit",
+                                        "id": "Action.Submit",
                                     }
                                 ],
+                                "horizontalAlignment": "Right",
                             }
                         ],
                     },
-                    {"type": "Column", "width": "stretch"},
-                    {"type": "Column", "width": "stretch"},
                 ],
             },
         ],
