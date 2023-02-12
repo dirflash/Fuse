@@ -33,6 +33,6 @@ jobs:
           webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
           room_id: ${{ github.event.client_payload.room_id }}
           person_id: ${{ github.event.client_payload.person_id }}
-          auth_mgrs: ${{ secrets.auth_mgrs }}
+          action: ${{ github.event.client_payload.action }}
         run: |
           python fuse-mgr-respond.py
