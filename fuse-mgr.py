@@ -1,16 +1,31 @@
 import os
 import sys
+import configparser
 import requests
 import json
 import pandas as pd
 
-webex_bearer = os.environ["webex_bearer"]
-attachment = os.environ["attachment"]
-room_id = os.environ["room_id"]
-room_type = os.environ["room_type"]
-person_id = os.environ["person_id"]
-person_email = os.environ["person_email"]
-auth_mgrs = os.environ["auth_mgrs"]
+KEY = "CI"
+if os.getenv(KEY):
+    print("Running as GitHub Action.")
+    webex_bearer = os.environ["webex_bearer"]
+    attachment = os.environ["attachment"]
+    room_id = os.environ["room_id"]
+    room_type = os.environ["room_type"]
+    person_id = os.environ["person_id"]
+    person_email = os.environ["person_email"]
+    auth_mgrs = os.environ["auth_mgrs"]
+else:
+    print("Running locally.")
+    config = configparser.ConfigParser()
+    config.read("./secrets/config.ini")
+    webex_bearer = config["DEFAULT"]["webex_key"]
+    attachment = config["DEFAULT"]["attachment"]
+    room_id = config["DEFAULT"]["room_id"]
+    room_type = config["DEFAULT"]["room_type"]
+    person_id = config["DEFAULT"]["person_id"]
+    person_email = config["DEFAULT"]["person_email"]
+    auth_mgrs = config["DEFAULT"]["auth_mgrs"]
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
