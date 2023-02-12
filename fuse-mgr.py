@@ -66,8 +66,8 @@ mgr_card = {
                 "fontType": "Monospace",
                 "size": "Large",
                 "color": "Default",
-                "weight": "Bolder"
-                "spacing": "None"
+                "weight": "Bolder",
+                "spacing": "None",
             },
             {
                 "type": "ColumnSet",
@@ -117,14 +117,8 @@ mgr_card = {
             {
                 "type": "ColumnSet",
                 "columns": [
-                    {
-                        "type": "Column",
-                        "width": "stretch"
-                        },
-                    {
-                        "type": "Column",
-                        "width": "stretch"
-                        },
+                    {"type": "Column", "width": "stretch"},
+                    {"type": "Column", "width": "stretch"},
                     {
                         "type": "Column",
                         "width": "stretch",
