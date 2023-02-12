@@ -67,7 +67,7 @@ mgr_card = {
                 "size": "Large",
                 "color": "Default",
                 "weight": "Bolder",
-                "spacing": "None",
+                "spacing": "Small",
             },
             {
                 "type": "ColumnSet",
@@ -80,6 +80,7 @@ mgr_card = {
                                 "type": "TextBlock",
                                 "text": "What can I do for you?",
                                 "wrap": True,
+                                "horizontalAlignment": "Center",
                                 "size": "Medium",
                             }
                         ],
