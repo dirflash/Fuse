@@ -50,38 +50,24 @@ mgr_card = {
                         "items": [
                             {
                                 "type": "Image",
-                                "style": "Person",
                                 "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
-                                "size": "Medium",
                                 "height": "100px",
                                 "width": "400px",
                             }
                         ],
-                        "width": "auto",
                     }
                 ],
             },
             {
-                "type": "ColumnSet",
-                "columns": [
-                    {
-                        "type": "Column",
-                        "width": 65,
-                        "items": [
-                            {
-                                "type": "TextBlock",
-                                "text": "Fuse Bot Mission Control",
-                                "weight": "Bolder",
-                                "color": "Default",
-                                "size": "Large",
-                                "fontType": "Monospace",
-                                "horizontalAlignment": "Center",
-                            }
-                        ],
-                    }
-                ],
-                "spacing": "Padding",
+                "type": "TextBlock",
+                "text": "Fuse Bot Mission Control",
+                "wrap": True,
                 "horizontalAlignment": "Center",
+                "fontType": "Monospace",
+                "size": "Large",
+                "color": "Default",
+                "weight": "Bolder"
+                "spacing": "None"
             },
             {
                 "type": "ColumnSet",
@@ -131,7 +117,14 @@ mgr_card = {
             {
                 "type": "ColumnSet",
                 "columns": [
-                    {"type": "Column", "width": "stretch", "isVisible": False},
+                    {
+                        "type": "Column",
+                        "width": "stretch"
+                        },
+                    {
+                        "type": "Column",
+                        "width": "stretch"
+                        },
                     {
                         "type": "Column",
                         "width": "stretch",
