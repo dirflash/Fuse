@@ -114,7 +114,7 @@ mgr_card = {
                                         "value": "noncomit_reminders",
                                     },
                                     {
-                                        "title": "Pre FUSE Reminder",
+                                        "title": "Send Pre FUSE Reminders",
                                         "value": "pre_reminder",
                                     },
                                     {

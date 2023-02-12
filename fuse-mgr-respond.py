@@ -28,7 +28,7 @@ def survey_msg():
     print("Post Event Survey")
 
 
-if action == "attend_port":
+if action == "attend_report":
     attend_report()
 elif action == "noncomit_reminders":
     noncomit_reminders()
