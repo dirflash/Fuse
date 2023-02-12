@@ -6,7 +6,7 @@ on:
     type: [FUSE_MGR_RESPONSE]
 jobs:
   build:
-    name: FUSE_MGR_RESPOND
+    name: FUSE_MGR_RESPONSE
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment: fuse_env
