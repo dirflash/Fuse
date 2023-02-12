@@ -79,6 +79,7 @@ mgr_card = {
                                 "type": "TextBlock",
                                 "text": "What can I do for you?",
                                 "wrap": True,
+                                "size": "Medium",
                             }
                         ],
                     },
