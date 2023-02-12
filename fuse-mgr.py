@@ -326,5 +326,5 @@ post_noncommited(noncommited_string, num_noncommited, person_email)
 NONCOMMITED_LST = noncommited["Alias"].values.tolist()
 
 
-Action_Choice: attend_port, noncomit_reminders, pre_reminder, survey_msg
+
 """
