@@ -1,9 +1,9 @@
-name: fuse-manager
+name: fuse-mgr-response
 
 # Controls when the action will run. Triggers the workflow on push request, or repository dispatch
 on:
   repository_dispatch:
-    type: [FUSE_Run]
+    type: [FUSE_MGR_RESPOND]
 jobs:
   build:
     name: Build machine
@@ -28,7 +28,7 @@ jobs:
           pip install --upgrade requests
           pip install -r requirements.txt
           if [ -f requirements.txt ]; then pip install --upgrade --upgrade-strategy eager -r requirements.txt; fi
-      - name: Run fuse-mgr.py # run file
+      - name: Run fuse-mgr-respond.py # run file
         env:
           webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
           attachment: ${{ github.event.client_payload.attachment }}
@@ -38,4 +38,4 @@ jobs:
           person_email: ${{ github.event.client_payload.person_email }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
         run: |
-          python fuse-mgr.py
+          python fuse-mgr-respond.py
