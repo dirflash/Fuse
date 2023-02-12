@@ -258,7 +258,6 @@ def mgr_control():
             "attachments": mgr_card,
         }
     )
-    print(payload)
     r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
     return r
 
