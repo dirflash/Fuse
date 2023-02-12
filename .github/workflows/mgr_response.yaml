@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: FUSE_MGR_RESPONSE
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: github.event.action == 'FUSE_MGR_RESPONSE'
     runs-on: ubuntu-latest
     environment: fuse_env
     steps:
