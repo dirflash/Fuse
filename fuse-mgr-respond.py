@@ -12,6 +12,7 @@ if os.getenv(KEY):
     room_id = os.environ["room_id"]
     person_id = os.environ["person_id"]
     person_email = os.environ["person_email"]
+    attachment = os.environ["attachment"]
     action = os.environ["action"]
     auth_mgrs = os.environ["auth_mgrs"]
 else:
