@@ -34,6 +34,7 @@ jobs:
           room_id: ${{ github.event.client_payload.room_id }}
           person_id: ${{ github.event.client_payload.person_id }}
           person_email: ${{ github.event.client_payload.person_email}}
+          attachment: ${{ github.event.client_payload.attachment }}
           action: ${{ github.event.client_payload.action }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
         run: |
