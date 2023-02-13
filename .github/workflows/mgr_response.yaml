@@ -34,5 +34,6 @@ jobs:
           room_id: ${{ github.event.client_payload.room_id }}
           person_id: ${{ github.event.client_payload.person_id }}
           action: ${{ github.event.client_payload.action }}
+          auth_mgrs: ${{ secrets.auth_mgrs }}
         run: |
           python fuse-mgr-respond.py
