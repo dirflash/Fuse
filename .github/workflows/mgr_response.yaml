@@ -24,7 +24,7 @@ jobs:
           key: ${{ hashFiles('fuse.py') }}-${{ hashFiles('requirements.txt') }}
       - name: Download attachment artifact
         uses: actions/download-artifact@v3
-        id: download
+        id: downloads
         with:
           name: attachment-artifact
           path: downloads
@@ -42,6 +42,6 @@ jobs:
           person_email: ${{ github.event.client_payload.person_email}}
           action: ${{ github.event.client_payload.action }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
-          attachment: ${{steps.download.outputs.attachment-artifact}}
+          attachment: ${{steps.downloads.outputs.attachment-artifact}}
         run: |
           python fuse-mgr-respond.py
