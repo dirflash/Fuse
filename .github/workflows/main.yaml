@@ -43,6 +43,7 @@ jobs:
   archive-build-artifacts:
     if: github.event.action == 'FUSE_Run'
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Create artifact download folder
         run: mkdir downloads
