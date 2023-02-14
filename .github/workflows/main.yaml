@@ -53,6 +53,6 @@ jobs:
       - name: Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         with:
-          name: assets-for-download
+          name: attachment-artifact
           path: downloads
           retention-days: 1
