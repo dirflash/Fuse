@@ -5,6 +5,17 @@ on:
   repository_dispatch:
     type: [FUSE_MGR_RESPONSE]
 jobs:
+  download-artifact:
+    name: Download attachment artifact
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        id: downloads
+        with:
+          name: attachment-artifact
+          path: downloads
   build:
     name: FUSE_MGR_RESPONSE
     if: github.event.action == 'FUSE_MGR_RESPONSE'
@@ -39,14 +50,3 @@ jobs:
           attachment: ${{steps.downloads.outputs.attachment-artifact}}
         run: |
           python fuse-mgr-respond.py
-  download-artifact:
-    name: Download attachment artifact
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        id: downloads
-        with:
-          name: attachment-artifact
-          path: downloads
