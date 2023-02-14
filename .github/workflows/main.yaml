@@ -41,6 +41,7 @@ jobs:
         run: |
           python fuse-mgr.py
   archive-build-artifacts:
+    if: github.event.action == 'FUSE_Run'
     runs-on: ubuntu-latest
     steps:
       - name: Create artifact download folder
