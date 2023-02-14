@@ -38,7 +38,7 @@ jobs:
         id: downloads
         with:
           name: attachment-artifact
-          path: downloads
+          path: attachment.txt
   run:
     name: Run fuse-mgr-respond.py # run file
     runs-on: ubuntu-latest
