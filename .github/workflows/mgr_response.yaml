@@ -22,6 +22,11 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ hashFiles('fuse.py') }}-${{ hashFiles('requirements.txt') }}
+      - name: Download attachment artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: attachment-artifact
+          path: downloads
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -34,8 +39,8 @@ jobs:
           room_id: ${{ github.event.client_payload.room_id }}
           person_id: ${{ github.event.client_payload.person_id }}
           person_email: ${{ github.event.client_payload.person_email}}
-          attachment: ${{ github.event.client_payload.attachment }}
           action: ${{ github.event.client_payload.action }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
+          attachment: ${{steps.download.outputs.attachment-artifact}}
         run: |
           python fuse-mgr-respond.py
