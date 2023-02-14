@@ -24,6 +24,7 @@ jobs:
           key: ${{ hashFiles('fuse.py') }}-${{ hashFiles('requirements.txt') }}
       - name: Download attachment artifact
         uses: actions/download-artifact@v3
+        id: download
         with:
           name: attachment-artifact
           path: downloads
