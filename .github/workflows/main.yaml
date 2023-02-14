@@ -55,5 +55,5 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: attachment-artifact
-          path: downloads
+          path: attachment.txt
           retention-days: 1
