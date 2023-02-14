@@ -51,7 +51,7 @@ jobs:
           echo ${{ github.event.client_payload.attachment }} > attachment.txt
           cd ..
       - name: Upload Artifact GitHub Action
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: attachment-artifact
           path: downloads
