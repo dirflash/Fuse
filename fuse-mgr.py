@@ -9,10 +9,13 @@ KEY = "CI"
 if os.getenv(KEY):
     print("Running as GitHub Action.")
     webex_bearer = os.environ["webex_bearer"]
+    ts = os.environ["ts"]
     attachment = os.environ["attachment"]
     room_id = os.environ["room_id"]
     room_type = os.environ["room_type"]
     person_id = os.environ["person_id"]
+    person_un = os.environ["person_un"]
+    person_display = os.environ["person_display"]
     person_email = os.environ["person_email"]
     auth_mgrs = os.environ["auth_mgrs"]
 else:

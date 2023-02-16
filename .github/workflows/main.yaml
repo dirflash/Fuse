@@ -32,29 +32,14 @@ jobs:
       - name: Run fuse-mgr.py # run file
         env:
           webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
+          ts: ${{ github.event.client_payload.ts }}
           attachment: ${{ github.event.client_payload.attachment }}
           room_id: ${{ github.event.client_payload.room_id }}
           room_type: ${{ github.event.client_payload.room_type }}
           person_id: ${{ github.event.client_payload.person_id }}
+          person_un: $${{ github.event.client_payload.person_un }}
+          person_display: $${{ github.event.client_payload.person_display }}
           person_email: ${{ github.event.client_payload.person_email }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
         run: |
           python fuse-mgr.py
-  archive-build-artifacts:
-    if: github.event.action == 'FUSE_Run'
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Create artifact download folder
-        run: mkdir downloads
-      - name: Add artifacts to download folder
-        run: |
-          cd downloads
-          echo ${{ github.event.client_payload.attachment }} > attachment.txt
-          cd ..
-      - name: Upload Artifact GitHub Action
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: attachment-artifact
-          path: downloads
-          retention-days: 1
