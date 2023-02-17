@@ -149,6 +149,18 @@ mgr_card = {
 }
 
 
+def header_check(dframe):
+    print("Checking for corrupted header names.")
+    idx0 = dframe.columns[0]
+    if idx0 != "Name":
+        print(f"Corruption detected in Index 0: {idx0}")
+        dframe.rename(columns={idx0: "Name"}, inplace=True)
+        print("Index 0 has been corrected.")
+        print(f"Header names: {list(df.columns.values)}")
+    else:
+        print("Index 0 is correct.")
+
+
 def alias_format(dframe):
     """Pull the full name and alias from the "name" column and put them in separate columns.
 
@@ -158,7 +170,7 @@ def alias_format(dframe):
     Returns:
         dataframe: dataframe with new 'Full Name' and 'Alias' column
     """
-    dframe[["Full Name", "Alias"]] = dframe["Name"].apply(
+    df[["Full Name", "Alias"]] = df["Name"].apply(
         lambda x: pd.Series(str(x).split("("))
     )
     dframe["Alias"] = dframe["Alias"].str.replace(r"\)", "", regex=True)
@@ -295,9 +307,12 @@ except:
 
 try:
     df = pd.read_csv(file_name, header=0)
-    # print(df.head())
+    # print(df.head(2))
 except OSError as e:
     sys.exit("CSV file not found!")
+
+print(f"Imported header names: {list(df.columns.values)}")
+header_check(df)
 
 df1 = alias_format(df)
 df2 = x_dups(df1)
