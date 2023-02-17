@@ -18,6 +18,12 @@ if os.getenv(KEY):
     person_display = os.environ["person_display"]
     person_email = os.environ["person_email"]
     auth_mgrs = os.environ["auth_mgrs"]
+    mongo_addr = os.environ["MONGO_ADDR"]
+    mongo_db = os.environ["MONGO_DB"]
+    bridge_collect = os.environ["BRIDGE_COLLECT"]
+    response_collect = os.environ["RESPONSE_COLLECT"]
+    mongo_un = os.environ["MONGO_UN"]
+    mongo_pw = os.environ["MONGO_PW"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
@@ -29,6 +35,12 @@ else:
     person_id = config["DEFAULT"]["person_id"]
     person_email = config["DEFAULT"]["person_email"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
+    mongo_addr = config["MONGO"]["mongo_addr"]
+    mongo_db = config["MONGO"]["mongo_db"]
+    bridge_collect = config["MONGO"]["bridge_collect"]
+    response_collect = config["MONGO"]["response_collect"]
+    mongo_un = config["MONGO"]["user_name"]
+    mongo_pw = config["MONGO"]["mongo_pw"]
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
@@ -264,6 +276,8 @@ def mgr_control():
     r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
     return r
 
+
+print(bridge_collect)
 
 if person_email in auth_mgrs:
     print("Authorized manager.")
