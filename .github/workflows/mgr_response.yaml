@@ -28,7 +28,7 @@ jobs:
           pip install --upgrade requests
           pip install -r requirements.txt
           if [ -f requirements.txt ]; then pip install --upgrade --upgrade-strategy eager -r requirements.txt; fi
-      - run: fuse-mgr-respond.py
+      - name: Run fuse-mgr-respond.py
         env:
           webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
           room_id: ${{ github.event.client_payload.room_id }}
@@ -37,5 +37,5 @@ jobs:
           action: ${{ github.event.client_payload.action }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
           attachment: ${{steps.downloads.outputs.attachment-artifact}}
-          run: |
-            python fuse-mgr-respond.py
+        run: |
+          python fuse-mgr-respond.py
