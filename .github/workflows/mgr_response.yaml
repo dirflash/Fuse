@@ -36,7 +36,7 @@ jobs:
           person_email: ${{ github.event.client_payload.person_email}}
           action: ${{ github.event.client_payload.action }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
-          attachment: ${{steps.downloads.outputs.attachment-artifact}}
+          attachment: ${{ github.event.client_payload.attachment }}
 
           # webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
           # ts: ${{ github.event.client_payload.ts }}
