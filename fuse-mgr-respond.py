@@ -186,7 +186,7 @@ try:
         print(get_attach_response.headers.get("content-disposition"))
         RAW_FILE_NAME = get_attach_response.headers.get("content-disposition")
     except NameError:
-        RAW_FILE_NAME = "N/A"
+        RAW_FILE_NAME = "fuse.csv"
 except requests.exceptions.Timeout:
     print("Timeout error. Try again.")
 except requests.exceptions.TooManyRedirects:
@@ -196,12 +196,9 @@ except requests.exceptions.HTTPError as err:
 except requests.exceptions.RequestException as cat_exception:
     raise SystemExit(cat_exception) from cat_exception
 
-if RAW_FILE_NAME != "N/A":
-    file = RAW_FILE_NAME.split('"')[1::2]
-    file_name = file[0]
-    print(f"Attachment file name: {file_name}")
-else:
-    print("Empty file attachment!")
+file = RAW_FILE_NAME.split('"')[1::2]
+file_name = file[0]
+print(f"Attachment file name: {file_name}")
 
 try:
     attach = get_attach_response.text
