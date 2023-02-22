@@ -180,7 +180,7 @@ try:
     )
     get_attach_response.raise_for_status()
     print(f"attachment received: ({get_attach_response.status_code})")
-    print(get_attach_response.headers)
+    print(get_attach_response.headers.get("content-disposition"))
     RAW_FILE_NAME = get_attach_response.headers["content-disposition"]
 except requests.exceptions.Timeout:
     print("Timeout error. Try again.")
