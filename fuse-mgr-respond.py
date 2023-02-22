@@ -181,7 +181,7 @@ try:
     get_attach_response.raise_for_status()
     print(f"attachment received: ({get_attach_response.status_code})")
     cnt_disp = get_attach_response.headers.get("content-disposition")
-    if cnt_disp != "None":
+    if cnt_disp != "":
         print(get_attach_response.headers.get("content-disposition"))
         RAW_FILE_NAME = get_attach_response.headers["content-disposition"]
 except requests.exceptions.Timeout:
@@ -193,7 +193,7 @@ except requests.exceptions.HTTPError as err:
 except requests.exceptions.RequestException as cat_exception:
     raise SystemExit(cat_exception) from cat_exception
 
-if RAW_FILE_NAME != "None":
+if RAW_FILE_NAME != "":
     file = RAW_FILE_NAME.split('"')[1::2]
     file_name = file[0]
     print(f"Attachment file name: {file_name}")
