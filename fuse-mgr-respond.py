@@ -171,6 +171,8 @@ else:
     not_authd_mgr(person_id)
     sys.exit()
 
+print(f"Attachment URL: {attachment}")
+
 try:
     # get file attachment
     get_attach_response = requests.request(
