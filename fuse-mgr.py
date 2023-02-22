@@ -3,6 +3,9 @@ import sys
 import configparser
 import json
 import requests
+import certifi
+from pymongo import MongoClient
+from datetime import datetime, timezone
 
 
 def not_authd_mgr(email):
@@ -42,12 +45,28 @@ def mgr_control():
     return r
 
 
+def timestamp():
+    now = datetime.now(timezone.utc)
+    dt_str = now.strftime("%Y-%m-%dT%H-%M-%S.%f")
+    dt_form_ms = dt_str[:-2]
+    dt_form = dt_form_ms + "Z"
+    return dt_form
+
+
 KEY = "CI"
 if os.getenv(KEY):
     print("Running as GitHub Action.")
     webex_bearer = os.environ["webex_bearer"]
     person_email = os.environ["person_email"]
     auth_mgrs = os.environ["auth_mgrs"]
+    mongo_addr = os.environ["MONGO_ADDR"]
+    mongo_db = os.environ["MONGO_DB"]
+    bridge_collect = os.environ["BRIDGE_COLLECT"]
+    response_collect = os.environ["RESPONSE_COLLECT"]
+    mongo_un = os.environ["MONGO_UN"]
+    mongo_pw = os.environ["MONGO_PW"]
+    ts = os.environ["ts"]
+    attachment = os.environ["attachment"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
@@ -55,6 +74,26 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_email = config["DEFAULT"]["person_email"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
+    mongo_addr = config["MONGO"]["MONGO_ADDR"]
+    mongo_db = config["MONGO"]["MONGO_DB"]
+    bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
+    response_collect = config["MONGO"]["RESPONSE_COLLECT"]
+    mongo_un = config["MONGO"]["MONGO_UN"]
+    mongo_pw = config["MONGO"]["MONGO_PW"]
+    ts = timestamp()
+    attachment = config["DEFAULT"]["attachment"]
+
+MAX_MONGODB_DELAY = 500
+
+Mongo_Client = MongoClient(
+    f"mongodb+srv://{mongo_un}:{mongo_pw}@{mongo_addr}/{mongo_db}?retryWrites=true&w=majority",
+    tlsCAFile=certifi.where(),
+    serverSelectionTimeoutMS=MAX_MONGODB_DELAY,
+)
+
+db = Mongo_Client[mongo_db]
+bridge_collection = db[bridge_collect]
+response_collection = db[response_collect]
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
@@ -179,6 +218,10 @@ else:
     not_authd_mgr(person_email)
     sys.exit()
 
+# Add Mongo record with data file, person_un, ts
+print(attachment)
+print(person_email)
+print(ts)
 
 mgr_ctl_response = mgr_control()
 

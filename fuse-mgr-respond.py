@@ -16,7 +16,7 @@ if os.getenv(KEY):
     person_id = os.environ["person_id"]
     # person_un = os.environ["person_un"]
     # person_email = os.environ["person_email"]
-    attachment = os.environ["attachment"]
+    attachment = os.environ["attachment"]  # < --- Not the right attachment URL
     action = os.environ["action"]
     auth_mgrs = os.environ["auth_mgrs"]
 else:

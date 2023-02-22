@@ -36,6 +36,12 @@ jobs:
           auth_mgrs: ${{ secrets.auth_mgrs }}
           ts: ${{ github.event.client_payload.ts }}
           attachment: ${{ github.event.client_payload.attachment }}
+          MONGO_ADDR: ${{ vars.MONGO_ADDR }}
+          MONGO_DB : ${{ vars.MONGO_DB }}
+          BRIDGE_COLLECT : ${{ vars.BRIDGE_COLLECT }}
+          RESPONSE_COLLECT : ${{ vars.RESPONSE_COLLECT }}
+          MONGO_UN : ${{ secrets.MONGO_UN }}
+          MONGO_PW : ${{ secrets.MONGO_PW }}
 
         run: |
           python fuse-mgr.py
