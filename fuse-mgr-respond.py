@@ -200,6 +200,8 @@ if RAW_FILE_NAME != "csv.csv":
     file = RAW_FILE_NAME.split('"')[1::2]
     file_name = file[0]
     print(f"Attachment file name: {file_name}")
+else:
+    file_name = RAW_FILE_NAME
 
 try:
     attach = get_attach_response.text
