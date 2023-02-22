@@ -12,10 +12,10 @@ KEY = "CI"
 if os.getenv(KEY):
     print("Running as GitHub Action.")
     webex_bearer = os.environ["webex_bearer"]
-    room_id = os.environ["room_id"]
+    # room_id = os.environ["room_id"]
     person_id = os.environ["person_id"]
-    person_un = os.environ["person_un"]
-    person_email = os.environ["person_email"]
+    # person_un = os.environ["person_un"]
+    # person_email = os.environ["person_email"]
     attachment = os.environ["attachment"]
     action = os.environ["action"]
     auth_mgrs = os.environ["auth_mgrs"]
@@ -25,10 +25,10 @@ else:
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
     attachment = config["DEFAULT"]["attachment"]
-    room_id = config["DEFAULT"]["room_id"]
+    # room_id = config["DEFAULT"]["room_id"]
     person_id = config["DEFAULT"]["person_id"]
-    person_un = config["DEFAULT"]["person_un"]
-    person_email = config["DEFAULT"]["person_email"]
+    # person_un = config["DEFAULT"]["person_un"]
+    # person_email = config["DEFAULT"]["person_email"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
     action = "attend_report"
 
@@ -179,15 +179,17 @@ try:
         "GET", attachment, headers=headers, timeout=2
     )
     get_attach_response.raise_for_status()
-    print(f"attachment received: ({get_attach_response.status_code})")
+    print(f"Attachment received: ({get_attach_response.status_code})")
     cnt_disp = get_attach_response.headers.get("content-disposition")
-    print(cnt_disp)
-    try:
-        cnt_disp
-        print(get_attach_response.headers.get("content-disposition"))
+    if bool(cnt_disp) is True:
+        print("'content-disposition' exists in the headers. Pulling out filename.")
         RAW_FILE_NAME = get_attach_response.headers.get("content-disposition")
-    except NameError:
-        RAW_FILE_NAME = "csv.csv"
+        file = RAW_FILE_NAME.split('"')[1::2]
+        file_name = file[0]
+        print(f"Attachment filename: {file_name}")
+    else:
+        print("'content-disposition' metadata not available. Defaulting file name.")
+        file_name = "csv.csv"
 except requests.exceptions.Timeout:
     print("Timeout error. Try again.")
 except requests.exceptions.TooManyRedirects:
@@ -196,13 +198,6 @@ except requests.exceptions.HTTPError as err:
     raise SystemExit(err) from err
 except requests.exceptions.RequestException as cat_exception:
     raise SystemExit(cat_exception) from cat_exception
-
-if RAW_FILE_NAME != "csv.csv":
-    file = RAW_FILE_NAME.split('"')[1::2]
-    file_name = file[0]
-    print(f"Attachment file name: {file_name}")
-else:
-    file_name = RAW_FILE_NAME
 
 try:
     attach = get_attach_response.text
@@ -226,7 +221,7 @@ df2 = x_dups(df1)
 no_resp, yes_respond, declined_respond = responses(df2)
 
 if action == "attend_report":
-    attend_report(no_resp, yes_respond, declined_respond, person_un)
+    attend_report(no_resp, yes_respond, declined_respond, person_id)
 elif action == "noncomit_reminders":
     noncomit_reminders()
 elif action == "pre_reminder":
