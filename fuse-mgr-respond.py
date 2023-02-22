@@ -26,8 +26,9 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     attachment = config["DEFAULT"]["attachment"]
     room_id = config["DEFAULT"]["room_id"]
-    person_un = config["DEFAULT"]["person_email"]
-    person_email = config["DEFAULT"]["person_id"]
+    person_id = config["DEFAULT"]["person_id"]
+    person_un = config["DEFAULT"]["person_un"]
+    person_email = config["DEFAULT"]["person_email"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
     action = "attend_report"
 
@@ -163,11 +164,11 @@ def responses(dframe):
     return (no_respond, y_respond, d_respond)
 
 
-if person_un in auth_mgrs:
+if person_id in auth_mgrs:
     print("Authorized manager.")
 else:
     print("Not an authorized manager.")
-    not_authd_mgr(person_un)
+    not_authd_mgr(person_id)
     sys.exit()
 
 try:
