@@ -171,15 +171,16 @@ else:
     not_authd_mgr(person_id)
     sys.exit()
 
-print(f"Attachment URL: {attachment}")
 
 try:
     # get file attachment
+    print(f"Get attachment URL: {attachment}")
     get_attach_response = requests.request(
         "GET", attachment, headers=headers, timeout=2
     )
     get_attach_response.raise_for_status()
     print(f"attachment received: ({get_attach_response.status_code})")
+    print(get_attach_response.headers)
     RAW_FILE_NAME = get_attach_response.headers["content-disposition"]
 except requests.exceptions.Timeout:
     print("Timeout error. Try again.")
