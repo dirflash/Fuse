@@ -181,6 +181,7 @@ try:
     get_attach_response.raise_for_status()
     print(f"attachment received: ({get_attach_response.status_code})")
     cnt_disp = get_attach_response.headers.get("content-disposition")
+    print(cnt_disp)
     try:
         cnt_disp
         print(get_attach_response.headers.get("content-disposition"))
