@@ -37,24 +37,17 @@ jobs:
           person_email: ${{ github.event.client_payload.person_email}}
           action: ${{ github.event.client_payload.action }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
-          attachment: ${{ github.event.client_payload.attachment }}
+          MONGO_ADDR: ${{ vars.MONGO_ADDR }}
+          MONGO_DB : ${{ vars.MONGO_DB }}
+          BRIDGE_COLLECT : ${{ vars.BRIDGE_COLLECT }}
+          RESPONSE_COLLECT : ${{ vars.RESPONSE_COLLECT }}
+          MONGO_UN : ${{ secrets.MONGO_UN }}
+          MONGO_PW : ${{ secrets.MONGO_PW }}
 
-          # webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
           # ts: ${{ github.event.client_payload.ts }}
-          # attachment: ${{ github.event.client_payload.attachment }}
-          # room_id: ${{ github.event.client_payload.room_id }}
           # room_type: ${{ github.event.client_payload.room_type }}
-          # person_id: ${{ github.event.client_payload.person_id }}
-          # person_un: $${{ github.event.client_payload.person_un }}
           # person_display: $${{ github.event.client_payload.person_display }}
-          # person_email: ${{ github.event.client_payload.person_email }}
-          # auth_mgrs: ${{ secrets.auth_mgrs }}
-          # MONGO_ADDR: ${{ vars.MONGO_ADDR }}
-          # MONGO_DB : ${{ vars.MONGO_DB }}
-          # BRIDGE_COLLECT : ${{ vars.BRIDGE_COLLECT }}
-          # RESPONSE_COLLECT : ${{ vars.RESPONSE_COLLECT }}
-          # MONGO_UN : ${{ secrets.MONGO_UN }}
-          # MONGO_PW : ${{ secrets.MONGO_PW }}
+          # attachment: ${{ github.event.client_payload.attachment }}
 
         run: |
           python fuse-mgr-respond.py
