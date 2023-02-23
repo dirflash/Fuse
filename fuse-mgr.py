@@ -11,7 +11,7 @@ from pymongo.errors import ConnectionFailure
 
 def timestamp():
     now = datetime.now(timezone.utc)
-    dt_str = now.strftime("%Y-%m-%dT%H-%M-%S.%f")
+    dt_str = now.strftime("%Y-%m-%dT%H:%M:%S.%f")
     dt_form_ms = dt_str[:-2]
     dt_form = dt_form_ms + "Z"
     return dt_form
@@ -87,7 +87,7 @@ def mgr_control():
 
 def fix_ts(rec_id: str, tmstmp: str):
     try:
-        tmsp = datetime.strptime(tmstmp, "%Y-%m-%dT%H-%M-%S.%fZ")
+        tmsp = datetime.strptime(tmstmp, "%Y-%m-%dT%H:%M:%S.%fZ")
         bridge_collection.update_one({"_id": rec_id}, {"$set": {"ts": tmsp}})
         print("Timestamp record converted from str to date and updated.")
     except ConnectionFailure as key_error:
