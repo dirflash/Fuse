@@ -5,33 +5,59 @@ import configparser
 import requests
 import pandas as pd
 import certifi
-from pymongo import MongoClient
+from pymongo import MongoClient, DESCENDING
 from datetime import datetime, timezone
 
 KEY = "CI"
 if os.getenv(KEY):
     print("Running as GitHub Action.")
     webex_bearer = os.environ["webex_bearer"]
-    # room_id = os.environ["room_id"]
     person_id = os.environ["person_id"]
-    # person_un = os.environ["person_un"]
-    # person_email = os.environ["person_email"]
-    attachment = os.environ["attachment"]  # < --- Not the right attachment URL
     action = os.environ["action"]
     auth_mgrs = os.environ["auth_mgrs"]
+    mongo_addr = os.environ["MONGO_ADDR"]
+    mongo_db = os.environ["MONGO_DB"]
+    bridge_collect = os.environ["BRIDGE_COLLECT"]
+    response_collect = os.environ["RESPONSE_COLLECT"]
+    mongo_un = os.environ["MONGO_UN"]
+    mongo_pw = os.environ["MONGO_PW"]
+
+    # room_id = os.environ["room_id"]
+    # person_un = os.environ["person_un"]
+    # person_email = os.environ["person_email"]
+    # attachment = os.environ["attachment"]  # < --- Not the right attachment URL
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
-    attachment = config["DEFAULT"]["attachment"]
-    # room_id = config["DEFAULT"]["room_id"]
     person_id = config["DEFAULT"]["person_id"]
-    # person_un = config["DEFAULT"]["person_un"]
-    # person_email = config["DEFAULT"]["person_email"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
     action = "attend_report"
+    mongo_addr = config["MONGO"]["MONGO_ADDR"]
+    mongo_db = config["MONGO"]["MONGO_DB"]
+    bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
+    response_collect = config["MONGO"]["RESPONSE_COLLECT"]
+    mongo_un = config["MONGO"]["MONGO_UN"]
+    mongo_pw = config["MONGO"]["MONGO_PW"]
 
+    # attachment = config["DEFAULT"]["attachment"]
+    # room_id = config["DEFAULT"]["room_id"]
+    # person_un = config["DEFAULT"]["person_un"]
+    # person_email = config["DEFAULT"]["person_email"]
+
+
+MAX_MONGODB_DELAY = 500
+
+Mongo_Client = MongoClient(
+    f"mongodb+srv://{mongo_un}:{mongo_pw}@{mongo_addr}/{mongo_db}?retryWrites=true&w=majority",
+    tlsCAFile=certifi.where(),
+    serverSelectionTimeoutMS=MAX_MONGODB_DELAY,
+)
+
+db = Mongo_Client[mongo_db]
+bridge_collection = db[bridge_collect]
+response_collection = db[response_collect]
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
@@ -164,6 +190,20 @@ def responses(dframe):
     return (no_respond, y_respond, d_respond)
 
 
+def chat_record(per_id):
+    recent_chat = (
+        bridge_collection.find({"person_email": per_id}).sort("ts", DESCENDING).limit(1)
+    )
+    for _ in recent_chat:
+        doc_id = {"_id": _["_id"]}
+        doc_per_email = _["person_email"]
+        doc_attach_url = _["attachment"]
+        print(f"Found most recent request from {doc_per_email}...")
+        print(f"with attachment URL: {doc_attach_url}")
+        # print(bridge_collection.find_one(doc_id))
+    return (doc_id, doc_per_email, doc_attach_url)
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
 else:
@@ -171,13 +211,12 @@ else:
     not_authd_mgr(person_id)
     sys.exit()
 
+chat_id, chat_email, chat_url = chat_record(person_id)
 
 try:
     # get file attachment
-    print(f"Get attachment URL: {attachment}")
-    get_attach_response = requests.request(
-        "GET", attachment, headers=headers, timeout=2
-    )
+    print(f"Get attachment URL: {chat_url}")
+    get_attach_response = requests.request("GET", chat_url, headers=headers, timeout=2)
     get_attach_response.raise_for_status()
     print(f"Attachment received: ({get_attach_response.status_code})")
     cnt_disp = get_attach_response.headers.get("content-disposition")
@@ -438,5 +477,22 @@ else:
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
+
+"""
+
+
+"""
+noncommited = df2[
+    (df2["Response"] == "None") & (df2["Attendance"] == "Required Attendee")
+]
+num_noncommited = len(noncommited)
+print(f"\nNoncommited Attendees: {num_noncommited}")
+noncommited_string = noncommited[["Full Name"]].to_string(index=False, header=False)
+
+post_noncommited(noncommited_string, num_noncommited, person_email)
+
+NONCOMMITED_LST = noncommited["Alias"].values.tolist()
+
+
 
 """
