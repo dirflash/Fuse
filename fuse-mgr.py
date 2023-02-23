@@ -243,19 +243,3 @@ print(f"Inserted Object ID: {record_id}")
 fix_ts(record_id, ts)
 
 mgr_ctl_response = mgr_control()
-
-"""
-noncommited = df2[
-    (df2["Response"] == "None") & (df2["Attendance"] == "Required Attendee")
-]
-num_noncommited = len(noncommited)
-print(f"\nNoncommited Attendees: {num_noncommited}")
-noncommited_string = noncommited[["Full Name"]].to_string(index=False, header=False)
-
-post_noncommited(noncommited_string, num_noncommited, person_email)
-
-NONCOMMITED_LST = noncommited["Alias"].values.tolist()
-
-
-
-"""
