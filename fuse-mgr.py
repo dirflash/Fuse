@@ -2,47 +2,11 @@ import os
 import sys
 import configparser
 import json
+from datetime import datetime, timezone
 import requests
 import certifi
 from pymongo import MongoClient
-from datetime import datetime, timezone
-
-
-def not_authd_mgr(email):
-    post_msg = "https://webexapis.com/v1/messages/"
-    pl_title = "**You don't appear to be an authorized manager of this bot. Mamma told me not to talk to strangers.**"
-    payload = json.dumps(
-        {
-            "toPersonEmail": email,
-            "markdown": pl_title,
-        }
-    )
-    try:
-        post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
-        )
-        post_msg_r.raise_for_status()
-        print(f"Not Authorized Manager Message sent ({post_msg_r.status_code})")
-    except requests.exceptions.Timeout:
-        print("Timeout error. Try again.")
-    except requests.exceptions.TooManyRedirects:
-        print("Bad URL")
-    except requests.exceptions.HTTPError as nc_err:
-        raise SystemExit(nc_err) from nc_err
-    except requests.exceptions.RequestException as nc_cat_exception:
-        raise SystemExit(nc_cat_exception) from nc_cat_exception
-
-
-def mgr_control():
-    payload = json.dumps(
-        {
-            "toPersonEmail": person_email,
-            "markdown": "Adaptive card response. Open message on a supported client to respond.",
-            "attachments": mgr_card,
-        }
-    )
-    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
-    return r
+from pymongo.errors import ConnectionFailure
 
 
 def timestamp():
@@ -82,6 +46,53 @@ else:
     mongo_pw = config["MONGO"]["MONGO_PW"]
     ts = timestamp()
     attachment = config["DEFAULT"]["attachment"]
+
+
+def not_authd_mgr(email):
+    post_msg = "https://webexapis.com/v1/messages/"
+    pl_title = "**You don't appear to be an authorized manager of this bot. Mamma told me not to talk to strangers.**"
+    payload = json.dumps(
+        {
+            "toPersonEmail": email,
+            "markdown": pl_title,
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg, headers=headers, data=payload, timeout=2
+        )
+        post_msg_r.raise_for_status()
+        print(f"Not Authorized Manager Message sent ({post_msg_r.status_code})")
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
+def mgr_control():
+    payload = json.dumps(
+        {
+            "toPersonEmail": person_email,
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": mgr_card,
+        }
+    )
+    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
+    return r
+
+
+def fix_ts(rec_id: str, tmstmp: str):
+    try:
+        tmsp = datetime.strptime(tmstmp, "%Y-%m-%dT%H-%M-%S.%fZ")
+        bridge_collection.update_one({"_id": rec_id}, {"$set": {"ts": tmsp}})
+        print("Timestamp record converted from str to date and updated.")
+    except ConnectionFailure as key_error:
+        print(key_error)
+
 
 MAX_MONGODB_DELAY = 500
 
@@ -222,6 +233,14 @@ else:
 print(attachment)
 print(person_email)
 print(ts)
+
+record = bridge_collection.insert_one(
+    {"ts": ts, "person_email": person_email, "attachment": attachment}
+)
+record_id = record.inserted_id
+print(f"Inserted Object ID: {record_id}")
+
+fix_ts(record_id, ts)
 
 mgr_ctl_response = mgr_control()
 
