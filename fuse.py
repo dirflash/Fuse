@@ -90,8 +90,6 @@ print(f"Declined Attendees ({len(declined)}):")
 noncommited = df2[
     (df2["Response"] == "None") & (df2["Attendance"] == "Required Attendee")
 ]
-# print(f"\nNoncommited Attendees ({len(noncommited)}):")
-# print(noncommited[["Full Name", "Alias", "Attendance", "Response"]].head())
 
 noncommit_lst = noncommited["Alias"].values.tolist()
 print(noncommit_lst)
