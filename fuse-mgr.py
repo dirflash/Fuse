@@ -197,10 +197,9 @@ mgr_card = {
             {
                 "type": "ColumnSet",
                 "columns": [
-                    {"type": "Column", "width": "stretch"},
                     {
                         "type": "Column",
-                        "width": "stretch",
+                        "width": "stretch"},
                         "items": [
                             {
                                 "type": "TextBlock",
