@@ -212,7 +212,7 @@ mgr_card = {
                                         "fontType": "Monospace",
                                     },
                                     {
-                                        "type": "RichTextBlock",
+                                        "type": "TextBlock",
                                         "text": "2/21/23",
                                         "fontType": "Monospace",
                                     },
