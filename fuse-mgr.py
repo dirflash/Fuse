@@ -195,38 +195,45 @@ mgr_card = {
                 ],
             },
             {
-                "type": "ColumnSet",
-                "columns": [
-                    {
-                        "type": "Column",
-                        "width": "stretch",
-                        "items": [
-                            {
-                                "type": "TextBlock",
-                                "text": "Fuse date:",
-                                "wrap": True,
-                                "horizontalAlignment": "Center",
-                                "fontType": "Monospace",
-                            },
-                            {
-                                "type": "RichTextBlock",
-                                "text": "2/21/23",
-                                "fontType": "Monospace",
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                "type": "Column",
-                "width": "stretch",
+                "type": "Container",
                 "items": [
                     {
-                        "type": "ActionSet",
-                        "actions": [{"type": "Action.Submit", "title": "Submit"}],
+                        "type": "ColumnSet",
+                        "columns": [
+                            {
+                                "type": "Column",
+                                "width": "stretch",
+                                "items": [
+                                    {
+                                        "type": "TextBlock",
+                                        "text": "Fuse date:",
+                                        "wrap": True,
+                                        "horizontalAlignment": "Center",
+                                        "fontType": "Monospace",
+                                    },
+                                    {
+                                        "type": "RichTextBlock",
+                                        "text": "2/21/23",
+                                        "fontType": "Monospace",
+                                    },
+                                ],
+                            },
+                            {
+                                "type": "Column",
+                                "width": "stretch",
+                                "items": [
+                                    {
+                                        "type": "ActionSet",
+                                        "actions": [
+                                            {"type": "Action.Submit", "title": "Submit"}
+                                        ],
+                                    }
+                                ],
+                                "horizontalAlignment": "Right",
+                            },
+                        ],
                     }
                 ],
-                "horizontalAlignment": "Right",
             },
         ],
         "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
