@@ -95,7 +95,7 @@ def fix_ts(rec_id: str, tmstmp: str):
 
 
 fs = date.today()
-fuse_date = str(fs + timedelta(days=7))
+fuse_date = f"Fuse date: {str(fs + timedelta(days=7))}"
 
 MAX_MONGODB_DELAY = 500
 
@@ -204,13 +204,6 @@ mgr_card = {
                                 "type": "Column",
                                 "width": "stretch",
                                 "items": [
-                                    {
-                                        "type": "TextBlock",
-                                        "text": "Fuse date:",
-                                        "wrap": True,
-                                        "horizontalAlignment": "Center",
-                                        "fontType": "Monospace",
-                                    },
                                     {
                                         "type": "TextBlock",
                                         "text": fuse_date,
