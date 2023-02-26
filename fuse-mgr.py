@@ -173,6 +173,10 @@ mgr_card = {
                                 "type": "Input.ChoiceSet",
                                 "choices": [
                                     {
+                                        "title": "Set Date",
+                                        "value": "fuse_date",
+                                    },
+                                    {
                                         "title": "Attendee Report",
                                         "value": "attend_report",
                                     },
