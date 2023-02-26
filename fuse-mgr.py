@@ -212,7 +212,7 @@ mgr_card = {
                             },
                             {
                                 "type": "TextBlock",
-                                "text": fuse_date,
+                                "text": "2/21/23",
                                 "fontType": "Monospace",
                             },
                             {
