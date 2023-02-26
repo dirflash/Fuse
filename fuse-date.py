@@ -75,6 +75,16 @@ mgr_card = {
                 "color": "Default",
             },
             {
+                "type": "TextBlock",
+                "text": "Date not set",
+                "wrap": True,
+                "horizontalAlignment": "Center",
+                "size": "Medium",
+                "weight": "Bolder",
+                "color": "Warning",
+                "fontType": "Monospace",
+            },
+            {
                 "type": "ColumnSet",
                 "columns": [
                     {

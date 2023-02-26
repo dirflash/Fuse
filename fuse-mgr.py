@@ -2,6 +2,7 @@ import os
 import sys
 import configparser
 import json
+import atexit
 from datetime import datetime, timezone, date, timedelta
 import requests
 import certifi
@@ -73,72 +74,6 @@ def not_authd_mgr(email):
         raise SystemExit(nc_err) from nc_err
     except requests.exceptions.RequestException as nc_cat_exception:
         raise SystemExit(nc_cat_exception) from nc_cat_exception
-
-
-def mgr_control(mgr_card):
-    payload = json.dumps(
-        {
-            "toPersonEmail": person_email,
-            "markdown": "Adaptive card response. Open message on a supported client to respond.",
-            "attachments": mgr_card,
-        }
-    )
-    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
-    return r
-
-
-def fix_ts(rec_id: str, tmstmp: str):
-    try:
-        tmsp = datetime.strptime(tmstmp, "%Y-%m-%dT%H:%M:%S.%fZ")
-        bridge_collection.update_one({"_id": rec_id}, {"$set": {"ts": tmsp}})
-        print("Timestamp record converted from str to date and updated.")
-    except ConnectionFailure as key_error:
-        print(key_error)
-
-
-def get_fuse_date(date_dbcollection):
-    # get_date_record = (
-    # date_collect.find({"fuse_date": per_id}).sort("ts", DESCENDING).limit(1)
-    # )
-    # get_date_record = date_collect.find().limit(1).sort({$natural:-1})
-    # get_date_record = date_collect.find({}, {sort: {timestamp: -1}, limit: 1}).toArray()
-    try:
-        get_date_record = date_dbcollection.find_one()
-        for _ in get_date_record:
-            time_id = {"_id": _["_id"]}
-            time_value = ["fuse_ts"]
-            print(f"Found most recent id {time_id}...")
-            print(f"with value of : {time_value}")
-            # print(bridge_collection.find_one(doc_id))
-    except:
-        print("No date record found.")
-        time_value = "NA"
-    return ()
-
-
-MAX_MONGODB_DELAY = 500
-
-Mongo_Client = MongoClient(
-    f"mongodb+srv://{mongo_un}:{mongo_pw}@{mongo_addr}/{mongo_db}?retryWrites=true&w=majority",
-    tlsCAFile=certifi.where(),
-    serverSelectionTimeoutMS=MAX_MONGODB_DELAY,
-)
-
-db = Mongo_Client[mongo_db]
-bridge_collection = db[bridge_collect]
-response_collection = db[response_collect]
-date_collection = db[date_collect]
-
-fs = date.today()
-form_fs = fs.strftime("%m/%d/%Y")
-fuse_date = f"Fuse date: {str(fs + timedelta(days=7))}"
-
-post_msg_url = "https://webexapis.com/v1/messages/"
-
-headers = {
-    "Authorization": webex_bearer,
-    "Content-Type": "application/json",
-}
 
 
 def manager_card():
@@ -270,6 +205,164 @@ def manager_card():
     return mgr_card
 
 
+def set_date_card():
+    setdate_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "ImageSet",
+                    "images": [
+                        {
+                            "type": "Image",
+                            "size": "Medium",
+                            "id": "fuse_image",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
+                        }
+                    ],
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Fuse Bot Mission Control",
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "fontType": "Monospace",
+                    "size": "Large",
+                    "weight": "Bolder",
+                    "color": "Default",
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Date not set",
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "size": "Medium",
+                    "weight": "Bolder",
+                    "color": "Warning",
+                    "fontType": "Monospace",
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "When is the next Fuse?",
+                                    "wrap": True,
+                                    "horizontalAlignment": "Center",
+                                    "size": "Medium",
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [{"type": "Input.Date", "id": "fuse_date"}],
+                        },
+                    ],
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {"type": "Column", "width": "stretch"},
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "ActionSet",
+                                    "actions": [
+                                        {
+                                            "type": "Action.Submit",
+                                            "title": "Submit",
+                                            "id": "fuse_date_submit",
+                                        }
+                                    ],
+                                    "horizontalAlignment": "Right",
+                                }
+                            ],
+                        },
+                    ],
+                },
+            ],
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+        },
+    }
+    return setdate_card
+
+
+def mgr_control(card):
+    payload = json.dumps(
+        {
+            "toPersonEmail": person_email,
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": card,
+        }
+    )
+    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
+    return r
+
+
+def fix_ts(rec_id: str, tmstmp: str):
+    try:
+        tmsp = datetime.strptime(tmstmp, "%Y-%m-%dT%H:%M:%S.%fZ")
+        bridge_collection.update_one({"_id": rec_id}, {"$set": {"ts": tmsp}})
+        print("Timestamp record converted from str to date and updated.")
+    except ConnectionFailure as key_error:
+        print(key_error)
+
+
+def get_fuse_date(date_dbcollection):
+    # get_date_record = (
+    # date_collect.find({"fuse_date": per_id}).sort("ts", DESCENDING).limit(1)
+    # )
+    # get_date_record = date_collect.find().limit(1).sort({$natural:-1})
+    # get_date_record = date_collect.find({}, {sort: {timestamp: -1}, limit: 1}).toArray()
+    try:
+        get_date_record = date_dbcollection.find_one()
+        for _ in get_date_record:
+            time_id = {"_id": _["_id"]}
+            time_value = ["fuse_ts"]
+            print(f"Found most recent id {time_id}...")
+            print(f"with value of : {time_value}")
+            # print(bridge_collection.find_one(doc_id))
+    except:
+        print("No date record found.")
+        time_value = "NA"
+    return time_value
+
+
+MAX_MONGODB_DELAY = 500
+
+Mongo_Client = MongoClient(
+    f"mongodb+srv://{mongo_un}:{mongo_pw}@{mongo_addr}/{mongo_db}?retryWrites=true&w=majority",
+    tlsCAFile=certifi.where(),
+    serverSelectionTimeoutMS=MAX_MONGODB_DELAY,
+)
+
+db = Mongo_Client[mongo_db]
+bridge_collection = db[bridge_collect]
+response_collection = db[response_collect]
+date_collection = db[date_collect]
+
+fs = date.today()
+form_fs = fs.strftime("%m/%d/%Y")
+fuse_date = f"Fuse date: {str(fs + timedelta(days=7))}"
+
+post_msg_url = "https://webexapis.com/v1/messages/"
+
+headers = {
+    "Authorization": webex_bearer,
+    "Content-Type": "application/json",
+}
+
 if person_email in auth_mgrs:
     print("Authorized manager.")
 else:
@@ -291,6 +384,11 @@ print(f"Inserted Object ID: {record_id}")
 fix_ts(record_id, ts)
 
 set_date = get_fuse_date(date_collect)
+if set_date == "NA":
+    sdc = set_date_card()
+    mgr_control(sdc)
+    print("Fuse date not set. Requested date and exited.")
+    os._exit(1)
 
 card = manager_card()
 

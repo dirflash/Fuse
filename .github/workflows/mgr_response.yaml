@@ -44,7 +44,7 @@ jobs:
           DATE_COLLECT : ${{ vars.DATE_COLLECT }}
           MONGO_UN : ${{ secrets.MONGO_UN }}
           MONGO_PW : ${{ secrets.MONGO_PW }}
-          FUSE_DATE : ${{ github.event.client_payload.action }}
+          FUSE_DATE : ${{ github.event.client_payload.fuse_date }}
 
           # ts: ${{ github.event.client_payload.ts }}
           # room_type: ${{ github.event.client_payload.room_type }}
