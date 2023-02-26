@@ -227,9 +227,9 @@ mgr_card = {
                                         "actions": [
                                             {"type": "Action.Submit", "title": "Submit"}
                                         ],
+                                        "horizontalAlignment": "Right",
                                     }
                                 ],
-                                "horizontalAlignment": "Right",
                             },
                         ],
                     }
