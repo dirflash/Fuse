@@ -27,6 +27,7 @@ if os.getenv(KEY):
     mongo_db = os.environ["MONGO_DB"]
     bridge_collect = os.environ["BRIDGE_COLLECT"]
     response_collect = os.environ["RESPONSE_COLLECT"]
+    date_collect = os.environ["DATE_COLLECT"]
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
     ts = os.environ["ts"]
@@ -42,6 +43,7 @@ else:
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
+    date_collect = config["MONGO"]["DATE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     ts = timestamp()
@@ -94,9 +96,25 @@ def fix_ts(rec_id: str, tmstmp: str):
         print(key_error)
 
 
-fs = date.today()
-form_fs = fs.strftime("%m/%d/%Y")
-fuse_date = f"Fuse date: {str(fs + timedelta(days=7))}"
+def get_fuse_date(date_dbcollection):
+    # get_date_record = (
+    # date_collect.find({"fuse_date": per_id}).sort("ts", DESCENDING).limit(1)
+    # )
+    # get_date_record = date_collect.find().limit(1).sort({$natural:-1})
+    # get_date_record = date_collect.find({}, {sort: {timestamp: -1}, limit: 1}).toArray()
+    try:
+        get_date_record = date_dbcollection.find_one()
+        for _ in get_date_record:
+            time_id = {"_id": _["_id"]}
+            time_value = ["fuse_ts"]
+            print(f"Found most recent id {time_id}...")
+            print(f"with value of : {time_value}")
+            # print(bridge_collection.find_one(doc_id))
+    except:
+        print("No date record found.")
+        time_value = "NA"
+    return ()
+
 
 MAX_MONGODB_DELAY = 500
 
@@ -109,6 +127,11 @@ Mongo_Client = MongoClient(
 db = Mongo_Client[mongo_db]
 bridge_collection = db[bridge_collect]
 response_collection = db[response_collect]
+date_collection = db[date_collect]
+
+fs = date.today()
+form_fs = fs.strftime("%m/%d/%Y")
+fuse_date = f"Fuse date: {str(fs + timedelta(days=7))}"
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
@@ -211,7 +234,7 @@ mgr_card = {
                                 "items": [
                                     {
                                         "type": "TextBlock",
-                                        "text": fuse_date,
+                                        "text": set_date,
                                         "horizontalAlignment": "Center",
                                         "fontType": "Monospace",
                                     },
@@ -260,5 +283,7 @@ record_id = record.inserted_id
 print(f"Inserted Object ID: {record_id}")
 
 fix_ts(record_id, ts)
+
+set_date = get_fuse_date(date_collect)
 
 mgr_ctl_response = mgr_control()

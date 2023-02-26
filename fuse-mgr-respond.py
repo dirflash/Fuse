@@ -19,6 +19,7 @@ if os.getenv(KEY):
     mongo_db = os.environ["MONGO_DB"]
     bridge_collect = os.environ["BRIDGE_COLLECT"]
     response_collect = os.environ["RESPONSE_COLLECT"]
+    date_collect = os.environ["DATE_COLLECT"]
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
     fuse_date = os.environ["FUSE_DATE"]
@@ -29,10 +30,11 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "noncomit_reminders"
+    action = "fuse_date"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
+    date_collect = config["MONGO"]["DATE_COLLECT"]
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
@@ -296,9 +298,11 @@ df1 = alias_format(df)
 df2 = x_dups(df1)
 no_resp, yes_respond, declined_respond = responses(df2)
 
-print(f"no_resp: \n {no_resp}\n")
-print(f"yes_respond: \n {yes_respond}\n")
-print(f"declined_respond: \n {declined_respond}\n")
+# print(f"no_resp: \n {no_resp}\n")
+# print(f"yes_respond: \n {yes_respond}\n")
+# print(f"declined_respond: \n {declined_respond}\n")
+
+print(f"Requested action: {action}")
 
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
@@ -308,6 +312,8 @@ elif action == "pre_reminder":
     pre_reminder()
 elif action == "survey_msg":
     survey_msg()
+elif action == "fuse_date":
+    print("Fuse_date action detected.")
 else:
     print("Unknown action.")
 

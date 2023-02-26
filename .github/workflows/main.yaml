@@ -40,6 +40,7 @@ jobs:
           MONGO_DB : ${{ vars.MONGO_DB }}
           BRIDGE_COLLECT : ${{ vars.BRIDGE_COLLECT }}
           RESPONSE_COLLECT : ${{ vars.RESPONSE_COLLECT }}
+          DATE_COLLECT : ${{ vars.DATE_COLLECT }}
           MONGO_UN : ${{ secrets.MONGO_UN }}
           MONGO_PW : ${{ secrets.MONGO_PW }}
 
