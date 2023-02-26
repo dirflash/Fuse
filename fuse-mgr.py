@@ -216,12 +216,14 @@ mgr_card = {
                                 "fontType": "Monospace",
                             },
                             {
-                                "type": "ActionSet",
-                                "actions": [
+                                "type": "Column",
+                                "width": "stretch",
+                                "items": [
                                     {
-                                        "type": "Action.Submit",
-                                        "title": "Submit",
-                                        "id": "Action.Submit",
+                                        "type": "ActionSet",
+                                        "actions": [
+                                            {"type": "Action.Submit", "title": "Submit"}
+                                        ],
                                     }
                                 ],
                                 "horizontalAlignment": "Right",
