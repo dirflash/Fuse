@@ -198,7 +198,6 @@ mgr_card = {
                 "type": "ColumnSet",
                 "columns": [
                     {"type": "Column", "width": "stretch"},
-                    {"type": "Column", "width": "stretch"},
                     {
                         "type": "Column",
                         "width": "stretch",
@@ -211,26 +210,24 @@ mgr_card = {
                                 "fontType": "Monospace",
                             },
                             {
-                                "type": "TextBlock",
+                                "type": "RichTextBlock",
                                 "text": "2/21/23",
                                 "fontType": "Monospace",
-                            },
-                            {
-                                "type": "Column",
-                                "width": "stretch",
-                                "items": [
-                                    {
-                                        "type": "ActionSet",
-                                        "actions": [
-                                            {"type": "Action.Submit", "title": "Submit"}
-                                        ],
-                                    }
-                                ],
-                                "horizontalAlignment": "Right",
                             },
                         ],
                     },
                 ],
+            },
+            {
+                "type": "Column",
+                "width": "stretch",
+                "items": [
+                    {
+                        "type": "ActionSet",
+                        "actions": [{"type": "Action.Submit", "title": "Submit"}],
+                    }
+                ],
+                "horizontalAlignment": "Right",
             },
         ],
         "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
