@@ -95,6 +95,7 @@ def fix_ts(rec_id: str, tmstmp: str):
 
 
 fs = date.today()
+form_fs = fs.strftime("%m/%d/%Y")
 fuse_date = f"Fuse date: {str(fs + timedelta(days=7))}"
 
 MAX_MONGODB_DELAY = 500
