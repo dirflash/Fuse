@@ -75,7 +75,7 @@ def not_authd_mgr(email):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
-def mgr_control():
+def mgr_control(mgr_card):
     payload = json.dumps(
         {
             "toPersonEmail": person_email,
@@ -140,128 +140,134 @@ headers = {
     "Content-Type": "application/json",
 }
 
-mgr_card = {
-    "contentType": "application/vnd.microsoft.card.adaptive",
-    "content": {
-        "type": "AdaptiveCard",
-        "body": [
-            {
-                "type": "ColumnSet",
-                "columns": [
-                    {
-                        "type": "Column",
-                        "items": [
-                            {
-                                "type": "Image",
-                                "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
-                                "height": "100px",
-                                "width": "400px",
-                            }
-                        ],
-                    }
-                ],
-            },
-            {
-                "type": "TextBlock",
-                "text": "Fuse Bot Mission Control",
-                "wrap": True,
-                "horizontalAlignment": "Center",
-                "fontType": "Monospace",
-                "size": "Large",
-                "color": "Default",
-                "weight": "Bolder",
-                "spacing": "Small",
-            },
-            {
-                "type": "ColumnSet",
-                "columns": [
-                    {
-                        "type": "Column",
-                        "width": "stretch",
-                        "items": [
-                            {
-                                "type": "TextBlock",
-                                "text": "What can I do for you?",
-                                "wrap": True,
-                                "horizontalAlignment": "Center",
-                                "size": "Medium",
-                            }
-                        ],
-                    },
-                    {
-                        "type": "Column",
-                        "width": "stretch",
-                        "items": [
-                            {
-                                "type": "Input.ChoiceSet",
-                                "choices": [
-                                    {
-                                        "title": "Set Date",
-                                        "value": "fuse_date",
-                                    },
-                                    {
-                                        "title": "Attendee Report",
-                                        "value": "attend_report",
-                                    },
-                                    {
-                                        "title": "Send Nudge",
-                                        "value": "noncomit_reminders",
-                                    },
-                                    {
-                                        "title": "Send Pre FUSE Reminders",
-                                        "value": "pre_reminder",
-                                    },
-                                    {
-                                        "title": "Send Survey Message",
-                                        "value": "survey_msg",
-                                    },
-                                ],
-                                "id": "Action_Choice",
-                            }
-                        ],
-                    },
-                ],
-            },
-            {
-                "type": "Container",
-                "items": [
-                    {
-                        "type": "ColumnSet",
-                        "columns": [
-                            {
-                                "type": "Column",
-                                "width": "stretch",
-                                "items": [
-                                    {
-                                        "type": "TextBlock",
-                                        "text": set_date,
-                                        "horizontalAlignment": "Center",
-                                        "fontType": "Monospace",
-                                    },
-                                ],
-                            },
-                            {
-                                "type": "Column",
-                                "width": "stretch",
-                                "items": [
-                                    {
-                                        "type": "ActionSet",
-                                        "actions": [
-                                            {"type": "Action.Submit", "title": "Submit"}
-                                        ],
-                                        "horizontalAlignment": "Right",
-                                    }
-                                ],
-                            },
-                        ],
-                    }
-                ],
-            },
-        ],
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "version": "1.2",
-    },
-}
+
+def manager_card():
+    mgr_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                                    "height": "100px",
+                                    "width": "400px",
+                                }
+                            ],
+                        }
+                    ],
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Fuse Bot Mission Control",
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "fontType": "Monospace",
+                    "size": "Large",
+                    "color": "Default",
+                    "weight": "Bolder",
+                    "spacing": "Small",
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "What can I do for you?",
+                                    "wrap": True,
+                                    "horizontalAlignment": "Center",
+                                    "size": "Medium",
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "Input.ChoiceSet",
+                                    "choices": [
+                                        {
+                                            "title": "Set Date",
+                                            "value": "fuse_date",
+                                        },
+                                        {
+                                            "title": "Attendee Report",
+                                            "value": "attend_report",
+                                        },
+                                        {
+                                            "title": "Send Nudge",
+                                            "value": "noncomit_reminders",
+                                        },
+                                        {
+                                            "title": "Send Pre FUSE Reminders",
+                                            "value": "pre_reminder",
+                                        },
+                                        {
+                                            "title": "Send Survey Message",
+                                            "value": "survey_msg",
+                                        },
+                                    ],
+                                    "id": "Action_Choice",
+                                }
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "ColumnSet",
+                            "columns": [
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": set_date,
+                                            "horizontalAlignment": "Center",
+                                            "fontType": "Monospace",
+                                        },
+                                    ],
+                                },
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "ActionSet",
+                                            "actions": [
+                                                {
+                                                    "type": "Action.Submit",
+                                                    "title": "Submit",
+                                                }
+                                            ],
+                                            "horizontalAlignment": "Right",
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                },
+            ],
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+        },
+    }
+    return mgr_card
 
 
 if person_email in auth_mgrs:
@@ -286,4 +292,6 @@ fix_ts(record_id, ts)
 
 set_date = get_fuse_date(date_collect)
 
-mgr_ctl_response = mgr_control()
+card = manager_card()
+
+mgr_ctl_response = mgr_control(card)
