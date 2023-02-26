@@ -2,7 +2,7 @@ import os
 import sys
 import configparser
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date, timedelta
 import requests
 import certifi
 from pymongo import MongoClient
@@ -93,6 +93,9 @@ def fix_ts(rec_id: str, tmstmp: str):
     except ConnectionFailure as key_error:
         print(key_error)
 
+
+fs = date.today()
+fuse_date = fs + timedelta(days=7)
 
 MAX_MONGODB_DELAY = 500
 
@@ -201,6 +204,18 @@ mgr_card = {
                         "width": "stretch",
                         "items": [
                             {
+                                "type": "TextBlock",
+                                "text": "Fuse date:",
+                                "wrap": True,
+                                "horizontalAlignment": "Center",
+                                "fontType": "Monospace",
+                            },
+                            {
+                                "type": "TextBlock",
+                                "text": fuse_date,
+                                "fontType": "Monospace",
+                            },
+                            {
                                 "type": "ActionSet",
                                 "actions": [
                                     {
@@ -210,7 +225,7 @@ mgr_card = {
                                     }
                                 ],
                                 "horizontalAlignment": "Right",
-                            }
+                            },
                         ],
                     },
                 ],
