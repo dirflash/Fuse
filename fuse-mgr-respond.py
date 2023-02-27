@@ -163,6 +163,7 @@ def manager_card(set_date):
                                             "text": set_date,
                                             "horizontalAlignment": "Center",
                                             "fontType": "Monospace",
+                                            "color": "Warning",
                                         },
                                     ],
                                 },
@@ -192,6 +193,99 @@ def manager_card(set_date):
         },
     }
     return mgr_card
+
+
+def set_date_card(date_msg):
+    setdate_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "ImageSet",
+                    "images": [
+                        {
+                            "type": "Image",
+                            "size": "Medium",
+                            "id": "fuse_image",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
+                        }
+                    ],
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Fuse Bot Mission Control",
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "fontType": "Monospace",
+                    "size": "Large",
+                    "weight": "Bolder",
+                    "color": "Default",
+                },
+                {
+                    "type": "TextBlock",
+                    "text": date_msg,
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "size": "Medium",
+                    "weight": "Bolder",
+                    "color": "Warning",
+                    "fontType": "Monospace",
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "When is the next Fuse?",
+                                    "wrap": True,
+                                    "horizontalAlignment": "Center",
+                                    "size": "Medium",
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [{"type": "Input.Date", "id": "fuse_date"}],
+                        },
+                    ],
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {"type": "Column", "width": "stretch"},
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "ActionSet",
+                                    "actions": [
+                                        {
+                                            "type": "Action.Submit",
+                                            "title": "Submit",
+                                            "id": "fuse_date_submit",
+                                        }
+                                    ],
+                                    "horizontalAlignment": "Right",
+                                }
+                            ],
+                        },
+                    ],
+                },
+            ],
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+        },
+    }
+    return setdate_card
 
 
 def mgr_control(card):
@@ -399,6 +493,21 @@ def set_fuse_date(day, p_id, collect):
     return day_fs
 
 
+def get_fuse_date(date_dbcollection):
+    try:
+        documents = date_dbcollection.find().sort("_id", -1).limit(1)
+        for _ in documents:
+            print(_)
+            time_id = _["_id"]
+            time_value = _["date"]
+            print(f"Found most recent id {time_id}...")
+            print(f"with value of : {time_value}")
+    except:
+        print("No date record found.")
+        time_value = "NA"
+    return time_value
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
 else:
@@ -467,11 +576,19 @@ elif action == "pre_reminder":
     pre_reminder()
 elif action == "survey_msg":
     survey_msg()
-elif action == "fuse_date":
-    fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
-    fuse_day_msg = f"Fuse date: {fuse_day}"
-    mgr_card = manager_card(fuse_day_msg)
-    mgr_ctl_response = mgr_control(mgr_card)
+elif action == "fuse_date":  # need to look up Fuse Date
+    set_date = get_fuse_date(date_collection)
+    if set_date == "NA":
+        date_msg = "Date not set."
+    else:
+        day_fs = datetime.strptime(set_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+        date_msg = f"Current Fuse date: {day_fs}"
+    sdc = set_date_card(date_msg)
+    mgr_control(sdc)
+    # fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
+    # fuse_day_msg = f"Fuse date: {fuse_day}"
+    # mgr_card = manager_card(fuse_day_msg)
+    # mgr_ctl_response = mgr_control(mgr_card)
 
 else:
     print("Unknown action.")
