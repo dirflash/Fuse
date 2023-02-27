@@ -38,7 +38,7 @@ else:
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
-    fuse_date = "2023-02-24"
+    fuse_date = "2023-03-25"
 
 MAX_MONGODB_DELAY = 500
 
@@ -568,6 +568,16 @@ no_resp, yes_respond, declined_respond = responses(df2)
 
 print(f"Requested action: {action}")
 
+set_date = get_fuse_date(date_collection)
+if set_date == "NA":
+    date_msg = f"Fuse date not set."
+    sdc = set_date_card(date_msg)
+    mgr_control(sdc)
+    print("Fuse date not set. Requested date and exited.")
+    os._exit(1)
+else:
+    set_date = fuse_date
+
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
 elif action == "noncomit_reminders":
@@ -577,12 +587,8 @@ elif action == "pre_reminder":
 elif action == "survey_msg":
     survey_msg()
 elif action == "fuse_date":  # need to look up Fuse Date
-    set_date = get_fuse_date(date_collection)
-    if set_date == "NA":
-        date_msg = "Date not set."
-    else:
-        fuse_day = set_fuse_date(set_date, person_id, date_collection)
-        date_msg = f"Fuse date changed to: {fuse_day}"
+    fuse_day = set_fuse_date(set_date, person_id, date_collection)
+    date_msg = f"Fuse date changed to: {fuse_day}"
     sdc = set_date_card(date_msg)
     mgr_control(sdc)
     # fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
