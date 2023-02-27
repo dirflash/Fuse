@@ -30,7 +30,7 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "fuse_date"
+    action = "attend_report"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -38,7 +38,7 @@ else:
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
-    fuse_date = "2023-03-04"
+    fuse_date = "NA"
 
 MAX_MONGODB_DELAY = 500
 
@@ -577,11 +577,12 @@ if set_date == "NA":
     print("Fuse date not set. Requested date and exited.")
     os._exit(1)
 else:
-    set_date = fuse_date
+    fuse_date = set_date
 
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
-    date_msg = f"Next Fuse date: {set_date}"
+    day_ar = datetime.strptime(fuse_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    date_msg = f"Next Fuse date: {day_ar}"
     fdc = manager_card(date_msg)
     mgr_control(fdc)
 elif action == "noncomit_reminders":
