@@ -581,8 +581,9 @@ elif action == "fuse_date":  # need to look up Fuse Date
     if set_date == "NA":
         date_msg = "Date not set."
     else:
-        day_fs = datetime.strptime(set_date, "%Y-%m-%d").strftime("%m-%d-%Y")
-        date_msg = f"Current Fuse date: {day_fs}"
+        fuse_day = set_fuse_date(set_date, person_id, date_collection)
+        day_fs = datetime.strptime(fuse_day, "%Y-%m-%d").strftime("%m-%d-%Y")
+        date_msg = f"Fuse date changed to: {day_fs}"
     sdc = set_date_card(date_msg)
     mgr_control(sdc)
     # fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
