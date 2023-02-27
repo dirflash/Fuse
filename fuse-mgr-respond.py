@@ -581,6 +581,9 @@ else:
 
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
+    date_msg = f"Next Fuse date: {set_date}"
+    fdc = manager_card(date_msg)
+    mgr_control(fdc)
 elif action == "noncomit_reminders":
     notify_emails_lst = noncomit_reminders(no_resp)
 elif action == "pre_reminder":
@@ -590,13 +593,12 @@ elif action == "survey_msg":
 elif action == "fuse_date":  # need to look up Fuse Date
     if fuse_date == "NA":
         print("Send change date card")
-        date_msg = f"Provide new date."
+        date_msg = "Select the new date"
         sdc = set_date_card(date_msg)
         mgr_control(sdc)
     else:
         fuse_day = set_fuse_date(set_date, person_id, date_collection)
         date_msg = f"Fuse date changed to: {fuse_day}"
-        # sdc = set_date_card(date_msg)
         fdc = manager_card(date_msg)
         mgr_control(fdc)
     # fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
