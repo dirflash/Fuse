@@ -174,6 +174,7 @@ def manager_card(n_date):
                                             "text": n_date,
                                             "horizontalAlignment": "Center",
                                             "fontType": "Monospace",
+                                            "color": "Warning",
                                             "wrap": True,
                                         },
                                     ],
