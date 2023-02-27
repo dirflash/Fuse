@@ -38,7 +38,7 @@ else:
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
-    fuse_date = "2023-03-25"
+    fuse_date = "2023-03-04"
 
 MAX_MONGODB_DELAY = 500
 
@@ -164,6 +164,7 @@ def manager_card(set_date):
                                             "horizontalAlignment": "Center",
                                             "fontType": "Monospace",
                                             "color": "Warning",
+                                            "wrap": True,
                                         },
                                     ],
                                 },
@@ -587,10 +588,17 @@ elif action == "pre_reminder":
 elif action == "survey_msg":
     survey_msg()
 elif action == "fuse_date":  # need to look up Fuse Date
-    fuse_day = set_fuse_date(set_date, person_id, date_collection)
-    date_msg = f"Fuse date changed to: {fuse_day}"
-    sdc = set_date_card(date_msg)
-    mgr_control(sdc)
+    if fuse_date == "NA":
+        print("Send change date card")
+        date_msg = f"Provide new date."
+        sdc = set_date_card(date_msg)
+        mgr_control(sdc)
+    else:
+        fuse_day = set_fuse_date(set_date, person_id, date_collection)
+        date_msg = f"Fuse date changed to: {fuse_day}"
+        # sdc = set_date_card(date_msg)
+        fdc = manager_card(date_msg)
+        mgr_control(fdc)
     # fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
     # day_fs = datetime.strptime(fuse_day, "%Y-%m-%d").strftime("%m-%d-%Y")
     # fuse_day_msg = f"Fuse date: {fuse_day}"
