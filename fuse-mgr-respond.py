@@ -38,6 +38,7 @@ else:
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
+    fuse_date = "2023-02-24"
 
 MAX_MONGODB_DELAY = 500
 
@@ -50,6 +51,7 @@ Mongo_Client = MongoClient(
 db = Mongo_Client[mongo_db]
 bridge_collection = db[bridge_collect]
 response_collection = db[response_collect]
+date_collection = db[date_collect]
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
@@ -60,6 +62,148 @@ headers = {
 
 RAW_FILE_NAME = ""
 NONCOMMITED_LST = []
+
+
+def manager_card(set_date):
+    mgr_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                                    "height": "100px",
+                                    "width": "400px",
+                                }
+                            ],
+                        }
+                    ],
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Fuse Bot Mission Control",
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "fontType": "Monospace",
+                    "size": "Large",
+                    "color": "Default",
+                    "weight": "Bolder",
+                    "spacing": "Small",
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "What can I do for you?",
+                                    "wrap": True,
+                                    "horizontalAlignment": "Center",
+                                    "size": "Medium",
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "Input.ChoiceSet",
+                                    "choices": [
+                                        {
+                                            "title": "Set Date",
+                                            "value": "fuse_date",
+                                            "wrap": True,
+                                        },
+                                        {
+                                            "title": "Attendee Report",
+                                            "value": "attend_report",
+                                        },
+                                        {
+                                            "title": "Send Nudge",
+                                            "value": "noncomit_reminders",
+                                        },
+                                        {
+                                            "title": "Send Pre FUSE Reminders",
+                                            "value": "pre_reminder",
+                                        },
+                                        {
+                                            "title": "Send Survey Message",
+                                            "value": "survey_msg",
+                                        },
+                                    ],
+                                    "id": "Action_Choice",
+                                }
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "ColumnSet",
+                            "columns": [
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": set_date,
+                                            "horizontalAlignment": "Center",
+                                            "fontType": "Monospace",
+                                        },
+                                    ],
+                                },
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "ActionSet",
+                                            "actions": [
+                                                {
+                                                    "type": "Action.Submit",
+                                                    "title": "Submit",
+                                                }
+                                            ],
+                                            "horizontalAlignment": "Right",
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                },
+            ],
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+        },
+    }
+    return mgr_card
+
+
+def mgr_control(card):
+    payload = json.dumps(
+        {
+            "toPersonEmail": person_id,
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": card,
+        }
+    )
+    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
+    return r
 
 
 def attend_report(silent_response, confirmed_response, denied_response, email):
@@ -244,6 +388,17 @@ def chat_record(per_id):
     return (doc_id, doc_per_email, doc_attach_url)
 
 
+def set_fuse_date(day, p_id, collect):
+    day_fs = datetime.strptime(day, "%Y-%m-%d").strftime(
+        "%m-%d-%Y"
+    )  # formatted date as str
+    # day_fd = datetime.strptime(day_fs, "%m-%d-%Y")  # date str as type(date) as Y-m-d & zero time
+    record = collect.insert_one({"person_email": p_id, "date": day})
+    record_id = record.inserted_id
+    print(f"Inserted Object ID into date collection: {record_id}")
+    return day_fs
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
 else:
@@ -313,7 +468,11 @@ elif action == "pre_reminder":
 elif action == "survey_msg":
     survey_msg()
 elif action == "fuse_date":
-    print("Fuse_date action detected.")
+    fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
+    fuse_day_msg = f"Fuse date: {fuse_day}"
+    mgr_card = manager_card(fuse_day_msg)
+    mgr_ctl_response = mgr_control(mgr_card)
+
 else:
     print("Unknown action.")
 

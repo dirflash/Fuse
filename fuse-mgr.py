@@ -6,7 +6,7 @@ import atexit
 from datetime import datetime, timezone, date, timedelta
 import requests
 import certifi
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 from pymongo.errors import ConnectionFailure
 
 
@@ -76,7 +76,7 @@ def not_authd_mgr(email):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
-def manager_card():
+def manager_card(n_date):
     mgr_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
         "content": {
@@ -171,9 +171,10 @@ def manager_card():
                                     "items": [
                                         {
                                             "type": "TextBlock",
-                                            "text": set_date,
+                                            "text": n_date,
                                             "horizontalAlignment": "Center",
                                             "fontType": "Monospace",
+                                            "wrap": True,
                                         },
                                     ],
                                 },
@@ -320,19 +321,14 @@ def fix_ts(rec_id: str, tmstmp: str):
 
 
 def get_fuse_date(date_dbcollection):
-    # get_date_record = (
-    # date_collect.find({"fuse_date": per_id}).sort("ts", DESCENDING).limit(1)
-    # )
-    # get_date_record = date_collect.find().limit(1).sort({$natural:-1})
-    # get_date_record = date_collect.find({}, {sort: {timestamp: -1}, limit: 1}).toArray()
     try:
-        get_date_record = date_dbcollection.find_one()
-        for _ in get_date_record:
-            time_id = {"_id": _["_id"]}
-            time_value = ["fuse_ts"]
+        documents = date_dbcollection.find().sort("_id", -1).limit(1)
+        for _ in documents:
+            print(_)
+            time_id = _["_id"]
+            time_value = _["date"]
             print(f"Found most recent id {time_id}...")
             print(f"with value of : {time_value}")
-            # print(bridge_collection.find_one(doc_id))
     except:
         print("No date record found.")
         time_value = "NA"
@@ -383,13 +379,17 @@ print(f"Inserted Object ID: {record_id}")
 
 fix_ts(record_id, ts)
 
-set_date = get_fuse_date(date_collect)
+set_date = get_fuse_date(date_collection)
 if set_date == "NA":
     sdc = set_date_card()
     mgr_control(sdc)
     print("Fuse date not set. Requested date and exited.")
     os._exit(1)
+else:
+    day_fs = datetime.strptime(set_date, "%Y-%m-%d").strftime("%m-%d-%Y")
 
-card = manager_card()
+next_date = f"Next Fuse Date: {day_fs}"
+
+card = manager_card(next_date)
 
 mgr_ctl_response = mgr_control(card)
