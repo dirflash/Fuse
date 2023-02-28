@@ -30,7 +30,7 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "attend_report"
+    action = "fuse_date"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -577,11 +577,11 @@ if set_date == "NA":
     print("Fuse date not set. Requested date and exited.")
     os._exit(1)
 else:
-    fuse_date = set_date
+    fuses_date = set_date
 
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
-    day_ar = datetime.strptime(fuse_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    day_ar = datetime.strptime(fuses_date, "%Y-%m-%d").strftime("%m-%d-%Y")
     date_msg = f"Next Fuse date: {day_ar}"
     fdc = manager_card(date_msg)
     mgr_control(fdc)
