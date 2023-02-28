@@ -130,7 +130,7 @@ def manager_card(set_date):
                                             "value": "attend_report",
                                         },
                                         {
-                                            "title": "Send Nudge",
+                                            "title": "Send RSVP Reminder",
                                             "value": "noncomit_reminders",
                                         },
                                         {
@@ -602,11 +602,6 @@ elif action == "fuse_date":  # need to look up Fuse Date
         date_msg = f"Fuse date changed to: {fuse_day}"
         fdc = manager_card(date_msg)
         mgr_control(fdc)
-    # fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
-    # day_fs = datetime.strptime(fuse_day, "%Y-%m-%d").strftime("%m-%d-%Y")
-    # fuse_day_msg = f"Fuse date: {fuse_day}"
-    # mgr_card = manager_card(fuse_day_msg)
-    # mgr_ctl_response = mgr_control(mgr_card)
 
 else:
     print("Unknown action.")
