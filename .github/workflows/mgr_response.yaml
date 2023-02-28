@@ -36,6 +36,8 @@ jobs:
           person_id: ${{ github.event.client_payload.person_id }}
           person_email: ${{ github.event.client_payload.person_email}}
           action: ${{ github.event.client_payload.action }}
+          session_date: ${{ github.event.client_payload.session_date }}
+          survey_url: ${{ github.event.client_payload.survey_url }}
           auth_mgrs: ${{ secrets.auth_mgrs }}
           MONGO_ADDR: ${{ vars.MONGO_ADDR }}
           MONGO_DB : ${{ vars.MONGO_DB }}
