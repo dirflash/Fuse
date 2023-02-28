@@ -13,7 +13,10 @@ if os.getenv(KEY):
     print("Running as GitHub Action.")
     webex_bearer = os.environ["webex_bearer"]
     person_id = os.environ["person_id"]
+    first_name = os.environ["first_name"]
     action = os.environ["action"]
+    survey_url = os.environ["survey_url"]
+    session_date = os.environ["session_date"]
     auth_mgrs = os.environ["auth_mgrs"]
     mongo_addr = os.environ["MONGO_ADDR"]
     mongo_db = os.environ["MONGO_DB"]
@@ -29,8 +32,11 @@ else:
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
+    first_name = "Bob"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "pre_reminder"
+    action = "survey_submit"
+    survey_url = "https://www.cisco.com"
+    session_date = "2023-02-25"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -301,6 +307,275 @@ def mgr_control(card):
     return r
 
 
+def survey_submit_card():
+    survey_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "ImageSet",
+                    "images": [
+                        {
+                            "type": "Image",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
+                            "size": "Medium",
+                        }
+                    ],
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Fuse Bot Mission Control",
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "fontType": "Monospace",
+                    "size": "Large",
+                    "weight": "Bolder",
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "Container",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "wrap": True,
+                                    "fontType": "Monospace",
+                                    "text": "Post Session Survey Request",
+                                    "horizontalAlignment": "Center",
+                                    "size": "Medium",
+                                    "color": "Default",
+                                    "weight": "Bolder",
+                                }
+                            ],
+                        },
+                        {
+                            "type": "ColumnSet",
+                            "columns": [
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "text": "Date of last Fuse session:",
+                                            "wrap": True,
+                                            "fontType": "Monospace",
+                                            "size": "Default",
+                                            "horizontalAlignment": "Right",
+                                        }
+                                    ],
+                                },
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {"type": "Input.Date", "id": "session_date"}
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "ColumnSet",
+                            "columns": [
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "TextBlock",
+                                            "wrap": True,
+                                            "fontType": "Monospace",
+                                            "size": "Default",
+                                            "text": "Survey Link:",
+                                            "horizontalAlignment": "Right",
+                                        }
+                                    ],
+                                },
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "Input.Text",
+                                            "placeholder": "Survey URL",
+                                            "style": "Url",
+                                            "id": "survey_url",
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "ColumnSet",
+                            "columns": [
+                                {"type": "Column", "width": "stretch"},
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "Input.Text",
+                                            "placeholder": "survey_submit",
+                                            "isVisible": False,
+                                            "id": "postevent_survey",
+                                            "value": "survey_submit",
+                                        }
+                                    ],
+                                },
+                                {"type": "Column", "width": "stretch"},
+                                {
+                                    "type": "Column",
+                                    "width": "stretch",
+                                    "items": [
+                                        {
+                                            "type": "ActionSet",
+                                            "actions": [
+                                                {
+                                                    "type": "Action.Submit",
+                                                    "title": "Submit",
+                                                    "id": "survey_submit",
+                                                }
+                                            ],
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                },
+            ],
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+        },
+    }
+    return survey_card
+
+
+def post_survey_card(fir_name, sess_date, surv_url):
+    day_fix = datetime.strptime(sess_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    main_msg = f"Hello, {fir_name}!\n\nThank you for participating in the Fuse session on {day_fix}. Your feedback is important. It would be great if you could complete this post event survey."
+    post_surv_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "ImageSet",
+                    "images": [
+                        {
+                            "type": "Image",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
+                            "size": "Medium",
+                        }
+                    ],
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Fuse Bot Mission Control",
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "fontType": "Monospace",
+                    "size": "Large",
+                    "weight": "Bolder",
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "Container",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "wrap": True,
+                                    "fontType": "Monospace",
+                                    "text": "Post Session Survey Request",
+                                    "horizontalAlignment": "Center",
+                                    "size": "Medium",
+                                    "color": "Default",
+                                    "weight": "Bolder",
+                                }
+                            ],
+                        }
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": main_msg,
+                            "wrap": True,
+                            "fontType": "Monospace",
+                            "size": "Small",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "Container",
+                            "items": [
+                                {
+                                    "type": "ColumnSet",
+                                    "columns": [
+                                        {"type": "Column", "width": "stretch"},
+                                        {
+                                            "type": "Column",
+                                            "width": "stretch",
+                                            "items": [
+                                                {
+                                                    "type": "ActionSet",
+                                                    "actions": [
+                                                        {
+                                                            "type": "Action.OpenUrl",
+                                                            "id": "survey_url",
+                                                            "title": "Launch Survey",
+                                                            "url": surv_url,
+                                                        }
+                                                    ],
+                                                }
+                                            ],
+                                        },
+                                        {"type": "Column", "width": "stretch"},
+                                    ],
+                                }
+                            ],
+                        },
+                    ],
+                },
+            ],
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+        },
+    }
+    return post_surv_card
+
+
+def post_survey_msg(p_s_c, pers_id):
+    payload = json.dumps(
+        {
+            "toPersonEmail": pers_id,
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": p_s_c,
+        }
+    )
+    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
+    return r
+
+
 def attend_report(silent_response, confirmed_response, denied_response, email):
     # print("Attendance Report")
     # print(silent_response.head())
@@ -388,8 +663,30 @@ def pre_reminder():
     print("Pre Event Reminders")
 
 
-def survey_msg():
+def survey_msg(s_card, email):
     print("Post Event Survey")
+    post_msg = "https://webexapis.com/v1/messages/"
+    payload = json.dumps(
+        {
+            "toPersonEmail": email,
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": s_card,
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg, headers=headers, data=payload, timeout=2
+        )
+        post_msg_r.raise_for_status()
+        print(f"Post Event Message sent ({post_msg_r.status_code})")
+    except requests.exceptions.Timeout:
+        print("Post Event Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Post Event Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
 def not_authd_mgr(email):
@@ -509,6 +806,13 @@ def get_fuse_date(date_dbcollection):
     return time_value
 
 
+def mgr_card(fss_date):
+    day_ar = datetime.strptime(fss_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    date_msg = f"Next Fuse date: {day_ar}"
+    fdc = manager_card(date_msg)
+    mgr_control(fdc)
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
 else:
@@ -581,29 +885,18 @@ else:
 
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
-    day_ar = datetime.strptime(fuses_date, "%Y-%m-%d").strftime("%m-%d-%Y")
-    date_msg = f"Next Fuse date: {day_ar}"
-    fdc = manager_card(date_msg)
-    mgr_control(fdc)
+    mgr_card(fuses_date)
 elif action == "noncomit_reminders":
     notify_emails_lst = noncomit_reminders(no_resp)
-    day_ar = datetime.strptime(fuses_date, "%Y-%m-%d").strftime("%m-%d-%Y")
-    date_msg = f"Next Fuse date: {day_ar}"
-    fdc = manager_card(date_msg)
-    mgr_control(fdc)
+    mgr_card(fuses_date)
 elif action == "pre_reminder":
     pre_reminder()
-    day_ar = datetime.strptime(fuses_date, "%Y-%m-%d").strftime("%m-%d-%Y")
-    date_msg = f"Next Fuse date: {day_ar}"
-    fdc = manager_card(date_msg)
-    mgr_control(fdc)
+    mgr_card(fuses_date)
 elif action == "survey_msg":
-    survey_msg()
-    day_ar = datetime.strptime(fuses_date, "%Y-%m-%d").strftime("%m-%d-%Y")
-    date_msg = f"Next Fuse date: {day_ar}"
-    fdc = manager_card(date_msg)
-    mgr_control(fdc)
-elif action == "fuse_date":  # need to look up Fuse Date
+    sur_card = survey_submit_card()
+    survey_msg(sur_card, person_id)
+    # mgr_card(fuses_date)
+elif action == "fuse_date":
     if fuse_date == "NA":
         print("Send change date card")
         date_msg = "Select the new date"
@@ -614,6 +907,12 @@ elif action == "fuse_date":  # need to look up Fuse Date
         date_msg = f"Fuse date changed to: {fuse_day}"
         fdc = manager_card(date_msg)
         mgr_control(fdc)
+elif action == "survey_submit":
+    print("Survey submit action.")
+    print(survey_url)
+    print(session_date)
+    pst_survey_card = post_survey_card(first_name, session_date, survey_url)
+    post_survey_msg(pst_survey_card, person_id)
 
 else:
     print("Unknown action.")
