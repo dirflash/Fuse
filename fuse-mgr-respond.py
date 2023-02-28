@@ -30,7 +30,7 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "fuse_date"
+    action = "pre_reminder"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -38,7 +38,7 @@ else:
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
-    fuse_date = "2023-02-18"
+    fuse_date = "NA"
 
 MAX_MONGODB_DELAY = 500
 
