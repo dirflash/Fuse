@@ -587,10 +587,22 @@ if action == "attend_report":
     mgr_control(fdc)
 elif action == "noncomit_reminders":
     notify_emails_lst = noncomit_reminders(no_resp)
+    day_ar = datetime.strptime(fuses_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    date_msg = f"Next Fuse date: {day_ar}"
+    fdc = manager_card(date_msg)
+    mgr_control(fdc)
 elif action == "pre_reminder":
     pre_reminder()
+    day_ar = datetime.strptime(fuses_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    date_msg = f"Next Fuse date: {day_ar}"
+    fdc = manager_card(date_msg)
+    mgr_control(fdc)
 elif action == "survey_msg":
     survey_msg()
+    day_ar = datetime.strptime(fuses_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    date_msg = f"Next Fuse date: {day_ar}"
+    fdc = manager_card(date_msg)
+    mgr_control(fdc)
 elif action == "fuse_date":  # need to look up Fuse Date
     if fuse_date == "NA":
         print("Send change date card")
