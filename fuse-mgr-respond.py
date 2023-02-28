@@ -38,7 +38,7 @@ else:
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
-    fuse_date = "NA"
+    fuse_date = "2023-02-18"
 
 MAX_MONGODB_DELAY = 500
 
@@ -598,7 +598,7 @@ elif action == "fuse_date":  # need to look up Fuse Date
         sdc = set_date_card(date_msg)
         mgr_control(sdc)
     else:
-        fuse_day = set_fuse_date(set_date, person_id, date_collection)
+        fuse_day = set_fuse_date(fuse_date, person_id, date_collection)
         date_msg = f"Fuse date changed to: {fuse_day}"
         fdc = manager_card(date_msg)
         mgr_control(fdc)
