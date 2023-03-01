@@ -34,7 +34,7 @@ else:
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "~~~~"
+    action = "survey_submit"
     survey_url = "https://www.cisco.com"
     session_date = "2023-02-25"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -840,7 +840,7 @@ def failed_msg(email):
             "POST", post_msg, headers=headers, data=payload, timeout=2
         )
         post_msg_r.raise_for_status()
-        print(f"Not Authorized Manager Message sent ({post_msg_r.status_code})")
+        print(f"Failed Message sent ({post_msg_r.status_code})")
     except requests.exceptions.Timeout:
         print("Timeout error. Try again.")
     except requests.exceptions.TooManyRedirects:
