@@ -884,15 +884,16 @@ no_resp, yes_respond, declined_respond = responses(df2)
 
 print(f"Requested action: {action}")
 
-set_date = get_fuse_date(date_collection)
-if set_date == "NA":
-    date_msg = f"Fuse date not set."
-    sdc = set_date_card(date_msg)
-    mgr_control(sdc)
-    print("Fuse date not set. Requested date and exited.")
-    os._exit(1)
-else:
-    fuses_date = set_date
+if action != "survey_submit":
+    set_date = get_fuse_date(date_collection)
+    if set_date == "NA":
+        date_msg = f"Fuse date not set."
+        sdc = set_date_card(date_msg)
+        mgr_control(sdc)
+        print("Fuse date not set. Requested date and exited.")
+        os._exit(1)
+    else:
+        fuses_date = set_date
 
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
@@ -920,8 +921,8 @@ elif action == "fuse_date":
         mgr_control(fdc)
 elif action == "survey_submit":
     print("Survey submit action.")
-    print(survey_url)
-    print(session_date)
+    print(f"Survey URL: {survey_url}")
+    print(f"Session date for survey: {session_date}")
     pst_survey_card = post_survey_card(first_name, session_date, survey_url)
     post_survey_msg(pst_survey_card, person_id)
 
