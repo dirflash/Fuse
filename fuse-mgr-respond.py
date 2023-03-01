@@ -36,7 +36,7 @@ else:
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
     action = "survey_submit"
     survey_url = "https://www.cisco.com"
-    session_date = "2023-02-25"
+    session_date = "2023-03-25"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -565,64 +565,66 @@ def post_survey_card(fir_name, sess_date, surv_url):
 
 
 def send_survey():
+    msg = "Please confirm the message above for accuracy. If everything looks good and you would like to send it to all the participants, click below."
     send_survey_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
         "content": {
             "type": "AdaptiveCard",
             "body": [
                 {
-                    "type": "AdaptiveCard",
-                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                    "version": "1.2",
-                    "body": [
+                    "type": "ImageSet",
+                    "images": [
                         {
-                            "type": "ImageSet",
-                            "images": [
-                                {
-                                    "type": "Image",
-                                    "size": "Medium",
-                                    "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
-                                    "horizontalAlignment": "Center",
-                                }
-                            ],
+                            "type": "Image",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
+                            "size": "Medium",
+                        }
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Fuse Bot Mission Control",
+                            "wrap": True,
+                            "horizontalAlignment": "Center",
+                            "fontType": "Monospace",
+                            "weight": "Bolder",
+                            "size": "Large",
                         },
                         {
-                            "type": "Container",
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "text": "Fuse Bot Mission Control",
-                                    "wrap": True,
-                                    "horizontalAlignment": "Center",
-                                    "fontType": "Monospace",
-                                    "size": "Large",
-                                    "weight": "Bolder",
-                                },
-                                {
-                                    "type": "TextBlock",
-                                    "text": "The above message is a sample of what will be sent. Please verify the message contents and click 'Send' when ready.",
-                                    "wrap": True,
-                                    "horizontalAlignment": "Center",
-                                    "fontType": "Monospace",
-                                    "size": "Small",
-                                    "weight": "Bolder",
-                                },
-                            ],
-                        },
-                        {
-                            "type": "ActionSet",
-                            "actions": [
-                                {
-                                    "type": "Action.Submit",
-                                    "title": "Send",
-                                    "id": "send_survey",
-                                }
-                            ],
-                            "horizontalAlignment": "Right",
+                            "type": "TextBlock",
+                            "wrap": True,
+                            "text": "Survey Request Proof Confirmation",
+                            "horizontalAlignment": "Center",
+                            "fontType": "Monospace",
+                            "weight": "Bolder",
+                            "size": "Medium",
                         },
                     ],
-                }
+                },
+                {
+                    "type": "TextBlock",
+                    "text": msg,
+                    "wrap": True,
+                    "horizontalAlignment": "Left",
+                    "fontType": "Monospace",
+                    "weight": "Bolder",
+                    "size": "Small",
+                },
+                {
+                    "type": "ActionSet",
+                    "actions": [
+                        {"type": "Action.Submit", "title": "Send", "id": "send_survey"}
+                    ],
+                    "horizontalAlignment": "Right",
+                },
             ],
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
         },
     }
     return send_survey_card
@@ -916,11 +918,13 @@ def failed_msg(email):
 
 
 def proof_confirmation(email, attach_card):
+    print("Proof confirmation.")
     post_msg = "https://webexapis.com/v1/messages/"
     payload = json.dumps(
         {
             "toPersonEmail": email,
-            "attachment": attach_card,
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": attach_card,
         }
     )
     try:
@@ -1041,6 +1045,7 @@ elif action == "survey_submit":
     pst_survey_card = post_survey_card(first_name, session_date, survey_url)
     post_survey_msg(pst_survey_card, person_id)
     attach_survey_card = send_survey()
+    print(attach_survey_card)
     proof_confirmation(person_id, attach_survey_card)
 
 else:
