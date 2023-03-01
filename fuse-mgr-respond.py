@@ -1074,6 +1074,8 @@ elif action == "survey_submit":
     attach_survey_card = send_survey()
     print(attach_survey_card)
     proof_confirmation(person_id, attach_survey_card)
+elif action == "post_survey_send":
+    print("Post Survey Send")
 
 else:
     print("Unknown action.")
