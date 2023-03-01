@@ -564,6 +564,70 @@ def post_survey_card(fir_name, sess_date, surv_url):
     return post_surv_card
 
 
+def send_survey():
+    send_survey_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "AdaptiveCard",
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "version": "1.2",
+                    "body": [
+                        {
+                            "type": "ImageSet",
+                            "images": [
+                                {
+                                    "type": "Image",
+                                    "size": "Medium",
+                                    "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                                    "horizontalAlignment": "Center",
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Container",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "Fuse Bot Mission Control",
+                                    "wrap": True,
+                                    "horizontalAlignment": "Center",
+                                    "fontType": "Monospace",
+                                    "size": "Large",
+                                    "weight": "Bolder",
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "The above message is a sample of what will be sent. Please verify the message contents and click 'Send' when ready.",
+                                    "wrap": True,
+                                    "horizontalAlignment": "Center",
+                                    "fontType": "Monospace",
+                                    "size": "Small",
+                                    "weight": "Bolder",
+                                },
+                            ],
+                        },
+                        {
+                            "type": "ActionSet",
+                            "actions": [
+                                {
+                                    "type": "Action.Submit",
+                                    "title": "Send",
+                                    "id": "send_survey",
+                                }
+                            ],
+                            "horizontalAlignment": "Right",
+                        },
+                    ],
+                }
+            ],
+        },
+    }
+    return send_survey_card
+
+
 def post_survey_msg(p_s_c, pers_id):
     payload = json.dumps(
         {
@@ -851,13 +915,12 @@ def failed_msg(email):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
-def proof_confirmation(email):
+def proof_confirmation(email, attach_card):
     post_msg = "https://webexapis.com/v1/messages/"
-    pl_title = "**This is the message that will be sent out. Please verify and confirm distribution.**"
     payload = json.dumps(
         {
             "toPersonEmail": email,
-            "markdown": pl_title,
+            "attachment": attach_card,
         }
     )
     try:
@@ -977,7 +1040,8 @@ elif action == "survey_submit":
     print(f"Session date for survey: {session_date}")
     pst_survey_card = post_survey_card(first_name, session_date, survey_url)
     post_survey_msg(pst_survey_card, person_id)
-    proof_confirmation(person_id)
+    attach_survey_card = send_survey()
+    proof_confirmation(person_id, attach_survey_card)
 
 else:
     print("Unknown action.")
