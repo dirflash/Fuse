@@ -34,7 +34,7 @@ else:
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "survey_submit"
+    action = "~~~~"
     survey_url = "https://www.cisco.com"
     session_date = "2023-02-25"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -824,6 +824,33 @@ def mgr_card(fss_date):
     mgr_control(fdc)
 
 
+def failed_msg(email):
+    post_msg = "https://webexapis.com/v1/messages/"
+    pl_title = (
+        "**Something unusual happened. Please wait a few minutes and try again.**"
+    )
+    payload = json.dumps(
+        {
+            "toPersonEmail": email,
+            "markdown": pl_title,
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg, headers=headers, data=payload, timeout=2
+        )
+        post_msg_r.raise_for_status()
+        print(f"Not Authorized Manager Message sent ({post_msg_r.status_code})")
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
 else:
@@ -928,6 +955,7 @@ elif action == "survey_submit":
 
 else:
     print("Unknown action.")
+    failed_msg(person_id)
 
 
 """
