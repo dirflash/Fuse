@@ -618,7 +618,11 @@ def send_survey():
                 {
                     "type": "ActionSet",
                     "actions": [
-                        {"type": "Action.Submit", "title": "Send", "id": "send_survey"}
+                        {
+                            "type": "Action.Submit",
+                            "title": "Send",
+                            "id": "send_post_survey",
+                        }
                     ],
                     "horizontalAlignment": "Right",
                 },
