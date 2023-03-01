@@ -616,15 +616,38 @@ def send_survey():
                     "size": "Small",
                 },
                 {
-                    "type": "ActionSet",
-                    "actions": [
+                    "type": "ColumnSet",
+                    "columns": [
                         {
-                            "type": "Action.Submit",
-                            "title": "Send",
-                            "id": "send_post_survey",
-                        }
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "Input.Text",
+                                    "id": "post_survey_send",
+                                    "value": "post_survey_send",
+                                    "isVisible": False,
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "ActionSet",
+                                    "actions": [
+                                        {
+                                            "type": "Action.Submit",
+                                            "title": "Yes",
+                                            "id": "send_post_survey",
+                                        }
+                                    ],
+                                    "horizontalAlignment": "Right",
+                                }
+                            ],
+                        },
                     ],
-                    "horizontalAlignment": "Right",
                 },
             ],
             "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
