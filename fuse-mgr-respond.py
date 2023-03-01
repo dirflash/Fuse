@@ -572,7 +572,18 @@ def post_survey_msg(p_s_c, pers_id):
             "attachments": p_s_c,
         }
     )
-    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
+    try:
+        r = requests.request(
+            "POST", post_msg_url, headers=headers, data=payload, timeout=2
+        )
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err) from err
+    except requests.exceptions.RequestException as cat_exception:
+        raise SystemExit(cat_exception) from cat_exception
     return r
 
 
