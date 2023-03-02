@@ -34,7 +34,7 @@ else:
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "survey_submit"
+    action = "post_survey_send"
     survey_url = "https://www.cisco.com"
     session_date = "2023-03-15"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -565,7 +565,7 @@ def post_survey_card(fir_name, sess_date, surv_url):
 
 
 def send_survey(s_date, s_url):
-    meta_msg = f'["{s_date}", "{s_url}"]'
+    meta_msg = f"{s_date}, {s_url}"
     msg = "Please confirm the message above for accuracy. If everything looks good and you would like to send it to all the participants, click below."
     send_survey_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
@@ -1127,6 +1127,9 @@ elif action == "post_survey_send":
     print("Post Survey Send")
     survey_lst = surveys(no_resp, yes_respond)
     print(f"Total number of surveys to send: {len(survey_lst)}")
+    print(action)
+    print(session_date)
+    print(survey_url)
     # survey_dispatch(person_id, session_date, survey_url, survey_lst)
     print("Kick off send surveys dispatch")
 
