@@ -31,8 +31,6 @@ jobs:
       - name: Run fuse-mgr-respond.py
         env:
           webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
-          room_id: ${{ github.event.client_payload.room_id }}
-          person_un: $${{ github.event.client_payload.person_un }}
           person_id: ${{ github.event.client_payload.person_id }}
           person_email: ${{ github.event.client_payload.person_email}}
           first_name: ${{ github.event.client_payload.first_name}}
