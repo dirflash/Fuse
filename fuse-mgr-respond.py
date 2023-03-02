@@ -34,9 +34,9 @@ else:
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "post_survey_send"
-    survey_url = "NA"
-    session_date = "NA"
+    action = "survey_submit"
+    survey_url = "https://www.cisco.com"
+    session_date = "2023-03-15"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -565,7 +565,7 @@ def post_survey_card(fir_name, sess_date, surv_url):
 
 
 def send_survey(s_date, s_url):
-    meta_msg = [s_date, s_url]
+    meta_msg = f"['{s_date}', '{s_url}']"
     msg = "Please confirm the message above for accuracy. If everything looks good and you would like to send it to all the participants, click below."
     send_survey_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
@@ -972,7 +972,7 @@ def proof_confirmation(email, attach_card):
             "POST", post_msg, headers=headers, data=payload, timeout=2
         )
         post_msg_r.raise_for_status()
-        print(f"Failed Message sent ({post_msg_r.status_code})")
+        print(f"Confirmation Message sent ({post_msg_r.status_code})")
     except requests.exceptions.Timeout:
         print("Timeout error. Try again.")
     except requests.exceptions.TooManyRedirects:
