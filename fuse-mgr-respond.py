@@ -34,9 +34,9 @@ else:
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "survey_submit"
-    survey_url = "https://www.cisco.com"
-    session_date = "2023-03-25"
+    action = "post_survey_send"
+    survey_url = "NA"
+    session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -564,7 +564,8 @@ def post_survey_card(fir_name, sess_date, surv_url):
     return post_surv_card
 
 
-def send_survey():
+def send_survey(s_date, s_url):
+    meta_msg = [s_date, s_url]
     msg = "Please confirm the message above for accuracy. If everything looks good and you would like to send it to all the participants, click below."
     send_survey_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
@@ -626,6 +627,18 @@ def send_survey():
                                     "type": "Input.Text",
                                     "id": "post_survey_send",
                                     "value": "post_survey_send",
+                                    "isVisible": False,
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "Input.Text",
+                                    "id": "post_survey_data",
+                                    "value": meta_msg,
                                     "isVisible": False,
                                 }
                             ],
@@ -970,6 +983,42 @@ def proof_confirmation(email, attach_card):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
+def surveys(noes, yesses):
+    survey_email = []
+    print("Create list of email address for survey request.")
+    noncommited = noes[
+        (noes["Response"] == "None") & (noes["Attendance"] == "Required Attendee")
+    ]
+    commited = yesses[
+        (yesses["Response"] == "Accepted")
+        & (yesses["Attendance"] == "Required Attendee")
+    ]
+    num_noncommited = len(noncommited)
+    num_commited = len(commited)
+    print(f"Noncommited Attendees: {num_noncommited}")
+    print(f"Commited Attendees: {num_commited}")
+    # The following 3 lines takes the "Full Name" column, converts it to a list, then to
+    # a string to solve formatting issues in the "report_to_manager" function.
+    noncommited_names = noncommited[["Full Name"]]
+    noncommited_list = noncommited_names["Full Name"].to_list()
+    # noncommited_list2str = "\n".join(str(e) for e in noncommited_list)
+    noncommited_alias_lst = noncommited[
+        "Alias"
+    ].values.tolist()  # list of email addresses to send reminder.
+    commited_names = commited[["Full Name"]]
+    commited_list = commited_names["Full Name"].to_list()
+    # commited_list2str = "\n".join(str(e) for e in commited_list)
+    commited_alias_lst = commited[
+        "Alias"
+    ].values.tolist()  # list of email addresses to send reminder.
+    for _ in noncommited_alias_lst:
+        survey_email.append(_ + "@cisco.com")
+    for _ in commited_alias_lst:
+        survey_email.append(_ + "@cisco.com")
+
+    return survey_email
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
 else:
@@ -1041,6 +1090,7 @@ if action != "survey_submit":
     else:
         fuses_date = set_date
 
+
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
     mgr_card(fuses_date)
@@ -1071,16 +1121,32 @@ elif action == "survey_submit":
     print(f"Session date for survey: {session_date}")
     pst_survey_card = post_survey_card(first_name, session_date, survey_url)
     post_survey_msg(pst_survey_card, person_id)
-    attach_survey_card = send_survey()
-    print(attach_survey_card)
+    attach_survey_card = send_survey(session_date, survey_url)
     proof_confirmation(person_id, attach_survey_card)
 elif action == "post_survey_send":
     print("Post Survey Send")
+    survey_lst = surveys(no_resp, yes_respond)
+    print(f"Total number of surveys to send: {len(survey_lst)}")
+    # survey_dispatch(person_id, session_date, survey_url, survey_lst)
+    print("Kick off send surveys dispatch")
 
 else:
     print("Unknown action.")
     failed_msg(person_id)
 
+
+"""
+    noncommited_names = noncommited[["Full Name"]]
+    noncommited_list = noncommited_names["Full Name"].to_list()
+    noncommited_list2str = "\n".join(str(e) for e in noncommited_list)
+    noncommited_alias_lst = noncommited[
+        "Alias"
+    ].values.tolist()  # list of email addresses to send reminder.
+    for _ in noncommited_alias_lst:
+        no_rsvp_email.append(_ + "@cisco.com")
+    report_to_manager(noncommited_list2str, num_noncommited, person_id)
+    return no_rsvp_email
+"""
 
 """
 noncommited = df2[
