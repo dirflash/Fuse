@@ -3,11 +3,11 @@ name: fuse-mgr-response
 # Controls when the action will run. Triggers the workflow on push request, or repository dispatch
 on:
   repository_dispatch:
-    type: [FUSE_MGR_RESPONSE]
+    type: [FUSE_SEND_SURVEYS]
 jobs:
   build:
-    name: FUSE_MGR_RESPONSE
-    if: github.event.action == 'FUSE_MGR_RESPONSE'
+    name: FUSE_SEND_SURVEYS
+    if: github.event.action == 'FUSE_SEND_SURVEYS'
     runs-on: ubuntu-latest
     environment: fuse_env
     steps:
@@ -39,21 +39,6 @@ jobs:
           action: ${{ github.event.client_payload.action }}
           session_date: ${{ github.event.client_payload.session_date }}
           survey_url: ${{ github.event.client_payload.survey_url }}
-          auth_mgrs: ${{ secrets.auth_mgrs }}
-          MONGO_ADDR: ${{ vars.MONGO_ADDR }}
-          MONGO_DB : ${{ vars.MONGO_DB }}
-          BRIDGE_COLLECT : ${{ vars.BRIDGE_COLLECT }}
-          RESPONSE_COLLECT : ${{ vars.RESPONSE_COLLECT }}
-          DATE_COLLECT : ${{ vars.DATE_COLLECT }}
-          MONGO_UN : ${{ secrets.MONGO_UN }}
-          MONGO_PW : ${{ secrets.MONGO_PW }}
-          FUSE_DATE : ${{ github.event.client_payload.fuse_date }}
-          GITHUB_PAT: ${{ secrets.FUSE_PAT }}
-
-          # ts: ${{ github.event.client_payload.ts }}
-          # room_type: ${{ github.event.client_payload.room_type }}
-          # person_display: $${{ github.event.client_payload.person_display }}
-          # attachment: ${{ github.event.client_payload.attachment }}
 
         run: |
-          python fuse-mgr-respond.py
+          python fuse_send_surveys.py

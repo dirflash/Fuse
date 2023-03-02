@@ -26,6 +26,7 @@ if os.getenv(KEY):
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
     fuse_date = os.environ["FUSE_DATE"]
+    github_pat = os.environ["GITHUB_PAT"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
@@ -45,6 +46,7 @@ else:
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
+    github_pat = config["DEFAULT"]["FUSE_PAT"]
 
 MAX_MONGODB_DELAY = 500
 
@@ -1015,8 +1017,42 @@ def surveys(noes, yesses):
         survey_email.append(_ + "@cisco.com")
     for _ in commited_alias_lst:
         survey_email.append(_ + "@cisco.com")
-
     return survey_email
+
+
+def send_survey_gh(p_id, act, sess_date, surv_url):
+    gh_headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+        "Authorization": github_pat,
+    }
+    gh_payload = json.dumps(
+        {
+            "event_type": "FUSE_MGR_RESPONSE",
+            "client_payload": {
+                "person_id": p_id,
+                "action": act,
+                "session_date": sess_date,
+                "survey_url": surv_url,
+            },
+        }
+    )
+
+    gh_webhook_url = "https://api.github.com/repos/dirflash/fuse/dispatches"
+    try:
+        gh_webhook_response = requests.request(
+            "POST", gh_webhook_url, headers=gh_headers, data=gh_payload, timeout=2
+        )
+        gh_webhook_response.raise_for_status()
+        print(f"Confirmation Message sent ({gh_webhook_response.status_code})")
+    except requests.exceptions.Timeout:
+        print("GitHub Action punt timed out. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
 if person_id in auth_mgrs:
@@ -1132,10 +1168,13 @@ elif action == "post_survey_send":
     print(survey_url)
     # survey_dispatch(person_id, session_date, survey_url, survey_lst)
     print("Kick off send surveys dispatch")
+    send_survey_gh(person_id, action, session_date, survey_url)
+    mgr_card(fuses_date)
 
 else:
     print("Unknown action.")
     failed_msg(person_id)
+    mgr_card(fuses_date)
 
 
 """
