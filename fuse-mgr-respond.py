@@ -565,7 +565,7 @@ def post_survey_card(fir_name, sess_date, surv_url):
 
 
 def send_survey(s_date, s_url):
-    meta_msg = f"['{s_date}', '{s_url}']"
+    meta_msg = f'["{s_date}", "{s_url}"]'
     msg = "Please confirm the message above for accuracy. If everything looks good and you would like to send it to all the participants, click below."
     send_survey_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
