@@ -29,11 +29,11 @@ jobs:
         env:
           webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
           person_id: ${{ github.event.client_payload.person_id }}
-          person_email: ${{ github.event.client_payload.person_email}}
-          first_name: ${{ github.event.client_payload.first_name}}
           action: ${{ github.event.client_payload.action }}
           session_date: ${{ github.event.client_payload.session_date }}
           survey_url: ${{ github.event.client_payload.survey_url }}
+          mongo_id: ${{ github.event.client_payload.mongo_id }}
+          SURVEY_COLLECT: ${{ vars.SURVEY_COLLECT }}
 
         run: |
           python fuse_send_surveys.py

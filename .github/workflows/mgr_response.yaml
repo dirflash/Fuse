@@ -49,6 +49,7 @@ jobs:
           MONGO_PW : ${{ secrets.MONGO_PW }}
           FUSE_DATE : ${{ github.event.client_payload.fuse_date }}
           GITHUB_PAT: ${{ secrets.FUSE_PAT }}
+          SURVEY_COLLECT: ${{ vars.SURVEY_COLLECT }}
 
           # ts: ${{ github.event.client_payload.ts }}
           # room_type: ${{ github.event.client_payload.room_type }}

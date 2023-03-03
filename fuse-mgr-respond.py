@@ -23,6 +23,7 @@ if os.getenv(KEY):
     bridge_collect = os.environ["BRIDGE_COLLECT"]
     response_collect = os.environ["RESPONSE_COLLECT"]
     date_collect = os.environ["DATE_COLLECT"]
+    survey_collect = os.environ["SURVEY_COLLECT"]
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
     fuse_date = os.environ["FUSE_DATE"]
@@ -43,6 +44,7 @@ else:
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
     date_collect = config["MONGO"]["DATE_COLLECT"]
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
+    survey_collect = config["MONGO"]["SURVEY_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
@@ -60,6 +62,7 @@ db = Mongo_Client[mongo_db]
 bridge_collection = db[bridge_collect]
 response_collection = db[response_collect]
 date_collection = db[date_collect]
+survey_collection = db[survey_collect]
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
@@ -696,8 +699,6 @@ def post_survey_msg(p_s_c, pers_id):
 
 
 def attend_report(silent_response, confirmed_response, denied_response, email):
-    # print("Attendance Report")
-    # print(silent_response.head())
     pl_title = (
         "Number of noncommited attendees: "
         + str(len(silent_response))
@@ -895,7 +896,6 @@ def chat_record(per_id):
         doc_attach_url = _["attachment"]
         print(f"Found most recent request from {doc_per_email}...")
         print(f"with attachment URL: {doc_attach_url}")
-        # print(bridge_collection.find_one(doc_id))
     return (doc_id, doc_per_email, doc_attach_url)
 
 
@@ -1020,7 +1020,7 @@ def surveys(noes, yesses):
     return survey_email
 
 
-def send_survey_gh(p_id, act, sess_date, surv_url):
+def send_survey_gh(p_id, act, sess_date, surv_url, mong_id):
     gh_headers = {
         "Accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
@@ -1028,12 +1028,13 @@ def send_survey_gh(p_id, act, sess_date, surv_url):
     }
     gh_payload = json.dumps(
         {
-            "event_type": "FUSE_MGR_RESPONSE",
+            "event_type": "FUSE_SEND_SURVEYS",
             "client_payload": {
                 "person_id": p_id,
                 "action": act,
                 "session_date": sess_date,
                 "survey_url": surv_url,
+                "mongo_id": mongo_id,
             },
         }
     )
@@ -1127,6 +1128,16 @@ if action != "survey_submit":
         fuses_date = set_date
 
 
+def survey_to_mongo(surv_lst, pern_id):
+    ts = datetime.now()
+    record = survey_collection.insert_one(
+        {"ts": ts, "person_email": pern_id, "survey_lst": surv_lst}
+    )
+    record_id = record.inserted_id
+    print(f"Inserted Object ID: {record_id}")
+    return record_id
+
+
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
     mgr_card(fuses_date)
@@ -1162,46 +1173,13 @@ elif action == "survey_submit":
 elif action == "post_survey_send":
     print("Post Survey Send")
     survey_lst = surveys(no_resp, yes_respond)
+    mongo_id = survey_to_mongo(survey_lst, person_id)
     print(f"Total number of surveys to send: {len(survey_lst)}")
-    print(action)
-    print(session_date)
-    print(survey_url)
-    # survey_dispatch(person_id, session_date, survey_url, survey_lst)
     print("Kick off send surveys dispatch")
-    send_survey_gh(person_id, action, session_date, survey_url)
+    send_survey_gh(person_id, action, session_date, survey_url, mongo_id)
     mgr_card(fuses_date)
 
 else:
     print("Unknown action.")
     failed_msg(person_id)
     mgr_card(fuses_date)
-
-
-"""
-    noncommited_names = noncommited[["Full Name"]]
-    noncommited_list = noncommited_names["Full Name"].to_list()
-    noncommited_list2str = "\n".join(str(e) for e in noncommited_list)
-    noncommited_alias_lst = noncommited[
-        "Alias"
-    ].values.tolist()  # list of email addresses to send reminder.
-    for _ in noncommited_alias_lst:
-        no_rsvp_email.append(_ + "@cisco.com")
-    report_to_manager(noncommited_list2str, num_noncommited, person_id)
-    return no_rsvp_email
-"""
-
-"""
-noncommited = df2[
-    (df2["Response"] == "None") & (df2["Attendance"] == "Required Attendee")
-]
-num_noncommited = len(noncommited)
-print(f"\nNoncommited Attendees: {num_noncommited}")
-noncommited_string = noncommited[["Full Name"]].to_string(index=False, header=False)
-
-post_noncommited(noncommited_string, num_noncommited, person_email)
-
-NONCOMMITED_LST = noncommited["Alias"].values.tolist()
-
-
-
-"""
