@@ -1020,7 +1020,8 @@ def surveys(noes, yesses):
     return survey_email
 
 
-def send_survey_gh(p_id, act, sess_date, surv_url, mong_id):
+def send_survey_gh(p_id, f_name, act, sess_date, surv_url, mong_id):
+    mong_id_str = str(mong_id)
     gh_headers = {
         "Accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
@@ -1031,10 +1032,11 @@ def send_survey_gh(p_id, act, sess_date, surv_url, mong_id):
             "event_type": "FUSE_SEND_SURVEYS",
             "client_payload": {
                 "person_id": p_id,
+                "first_name": f_name,
                 "action": act,
                 "session_date": sess_date,
                 "survey_url": surv_url,
-                "mongo_id": mongo_id,
+                "mongo_id": mong_id_str,
             },
         }
     )
@@ -1054,6 +1056,16 @@ def send_survey_gh(p_id, act, sess_date, surv_url, mong_id):
         raise SystemExit(nc_err) from nc_err
     except requests.exceptions.RequestException as nc_cat_exception:
         raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
+def survey_to_mongo(surv_lst, pern_id):
+    ts = datetime.now()
+    record = survey_collection.insert_one(
+        {"ts": ts, "person_email": pern_id, "survey_lst": surv_lst}
+    )
+    record_id = record.inserted_id
+    print(f"Inserted Object ID: {record_id}")
+    return record_id
 
 
 if person_id in auth_mgrs:
@@ -1129,17 +1141,6 @@ if action != "survey_submit":
     else:
         fuses_date = set_date
 
-
-def survey_to_mongo(surv_lst, pern_id):
-    ts = datetime.now()
-    record = survey_collection.insert_one(
-        {"ts": ts, "person_email": pern_id, "survey_lst": surv_lst}
-    )
-    record_id = record.inserted_id
-    print(f"Inserted Object ID: {record_id}")
-    return record_id
-
-
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
     mgr_card(fuses_date)
@@ -1178,7 +1179,7 @@ elif action == "post_survey_send":
     mongo_id = survey_to_mongo(survey_lst, person_id)
     print(f"Total number of surveys to send: {len(survey_lst)}")
     print("Kick off send surveys dispatch")
-    send_survey_gh(person_id, action, session_date, survey_url, mongo_id)
+    send_survey_gh(person_id, first_name, action, session_date, survey_url, mongo_id)
     mgr_card(fuses_date)
 
 else:
