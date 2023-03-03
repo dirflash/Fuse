@@ -58,7 +58,9 @@ for _ in g:
     if str(_["_id"]) == mongo_rec_id:
         id_check = True
         emails = _["survey_lst"]
-        print(f"Number of messages to send: {len(emails)}")
+        for inx, person in enumerate(emails):
+            inx_plus = inx + 1
+            print(f"Message {inx_plus} of {len(emails)} to be sent to {person}.")
     else:
         id_check = False
         sys.exit(1)

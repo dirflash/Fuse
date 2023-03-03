@@ -1085,8 +1085,10 @@ except requests.exceptions.Timeout:
 except requests.exceptions.TooManyRedirects:
     print("Bad URL")
 except requests.exceptions.HTTPError as err:
+    failed_msg(person_id)
     raise SystemExit(err) from err
 except requests.exceptions.RequestException as cat_exception:
+    failed_msg(person_id)
     raise SystemExit(cat_exception) from cat_exception
 
 try:
