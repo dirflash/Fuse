@@ -21,7 +21,7 @@ if os.getenv(KEY):
     survey_collect = os.environ["SURVEY_COLLECT"]
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
-    mongo_rec_id = os.environ["MONGO_ID"]
+    mongo_rec_id = os.environ["mongo_id"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
