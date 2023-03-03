@@ -2,11 +2,10 @@ import os
 import sys
 import configparser
 import json
-import atexit
 from datetime import datetime, timezone, date, timedelta
 import requests
 import certifi
-from pymongo import MongoClient, ASCENDING
+from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
 

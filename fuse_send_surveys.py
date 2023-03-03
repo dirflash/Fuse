@@ -3,7 +3,6 @@ import sys
 import json
 import configparser
 import requests
-import pandas as pd
 import certifi
 from pymongo import MongoClient
 from datetime import datetime
@@ -176,7 +175,7 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
     # Send the test card
     payload = json.dumps(
         {
-            "toPersonEmail": "aarodavi@cisco.com",  # per,
+            "toPersonEmail": "aarodavi@cisco.com",  # per,        Change this when ready to activate
             "markdown": "Adaptive card response. Open message on a supported client to respond.",
             "attachments": ss_card,
         }
@@ -231,9 +230,3 @@ for _ in g:
     else:
         id_check = False
         sys.exit(1)
-
-"""
-if id_check is True:
-    for _ in emails:
-        rate_limited_msg(_)
-"""

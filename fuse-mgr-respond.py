@@ -6,7 +6,9 @@ import requests
 import pandas as pd
 import certifi
 from pymongo import MongoClient, DESCENDING
-from datetime import datetime, timezone
+from datetime import datetime
+
+# import validators
 
 KEY = "CI"
 if os.getenv(KEY):
@@ -1164,9 +1166,12 @@ elif action == "fuse_date":
         date_msg = f"Fuse date changed to: {fuse_day}"
         fdc = manager_card(date_msg)
         mgr_control(fdc)
-elif action == "survey_submit":
+elif action == "survey_submit":  # Need to validate survey_url here.
     print("Survey submit action.")
-    print(f"Survey URL: {survey_url}")
+    # if validators.url(survey_url) is True:
+    # print(f"Valid survey URL: {survey_url}")
+    # else:
+    # print(f"Invalid survey URL: {survey_url}")
     print(f"Session date for survey: {session_date}")
     pst_survey_card = post_survey_card(first_name, session_date, survey_url)
     post_survey_msg(pst_survey_card, person_id)
