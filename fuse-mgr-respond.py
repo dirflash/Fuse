@@ -1021,7 +1021,6 @@ def surveys(noes, yesses):
 
 
 def send_survey_gh(p_id, f_name, act, sess_date, surv_url, mong_id):
-    mong_id_str = str(mong_id)
     gh_headers = {
         "Accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
@@ -1036,7 +1035,7 @@ def send_survey_gh(p_id, f_name, act, sess_date, surv_url, mong_id):
                 "action": act,
                 "session_date": sess_date,
                 "survey_url": surv_url,
-                "mongo_id": mong_id_str,
+                "mongo_id": mong_id,
             },
         }
     )
@@ -1065,7 +1064,7 @@ def survey_to_mongo(surv_lst, pern_id):
     )
     record_id = record.inserted_id
     print(f"Inserted Object ID: {record_id}")
-    return record_id
+    return str(record_id)
 
 
 if person_id in auth_mgrs:

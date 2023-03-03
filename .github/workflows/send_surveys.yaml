@@ -39,7 +39,6 @@ jobs:
           MONGO_UN : ${{ secrets.MONGO_UN }}
           MONGO_PW : ${{ secrets.MONGO_PW }}
           SURVEY_COLLECT: ${{ vars.SURVEY_COLLECT }}
-          MONGO_ID: ${{ github.event.client_payload.MONGO_ID }}
 
         run: |
           python fuse_send_surveys.py
