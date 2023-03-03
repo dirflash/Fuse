@@ -34,6 +34,8 @@ jobs:
           session_date: ${{ github.event.client_payload.session_date }}
           survey_url: ${{ github.event.client_payload.survey_url }}
           mongo_id: ${{ github.event.client_payload.mongo_id }}
+          MONGO_UN : ${{ secrets.MONGO_UN }}
+          MONGO_PW : ${{ secrets.MONGO_PW }}
           SURVEY_COLLECT: ${{ vars.SURVEY_COLLECT }}
 
         run: |
