@@ -787,18 +787,34 @@ def rsvp_db_upload(nofy_emails_lst, f_day, resp="none"):
     rec_id = []
     ts = datetime.now()
     for x in nofy_emails_lst:
-        record = rsvp_collection.insert_one(
-            {
-                "ts": ts,
-                "fuse_date": f_day,
-                "name": x["name"],
-                "email": x["email"],
-                "response": resp,
-            }
-        )
-        record_id = record.inserted_id
-        rec_id.append(record_id)
-    print(f"Inserted {len(rec_id)} Object IDs")
+        x_name = x["name"]
+        x_exist = rsvp_collection.find_one({"name": x_name})
+        if bool(x_exist):
+            print(f"{x_name} exists")
+            if x_exist["fuse_date"] != f_day:
+                rsvp_collection.update_one(
+                    {"name": x_name}, {"$set": {"fuse_date": f_day}}
+                )
+            if x_exist["response"] != resp:
+                rsvp_collection.update_one(
+                    {"name": x_name}, {"$set": {"response": resp}}
+                )
+        else:
+            record = rsvp_collection.insert_one(
+                {
+                    "ts": ts,
+                    "fuse_date": f_day,
+                    "name": x["name"],
+                    "email": x["email"],
+                    "response": resp,
+                }
+            )
+            record_id = record.inserted_id
+            rec_id.append(record_id)
+    if len(rec_id) == 0:
+        print("Inserted no new Object IDs.")
+    else:
+        print(f"Inserted {len(rec_id)} Object IDs")
     return rec_id
 
 
