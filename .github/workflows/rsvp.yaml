@@ -33,6 +33,7 @@ jobs:
           MONGO_DB : ${{ vars.MONGO_DB }}
           MONGO_UN : ${{ secrets.MONGO_UN }}
           MONGO_PW : ${{ secrets.MONGO_PW }}
+          RSVP_COLLECT: ${{ vars.RSVP_COLLECT }}
 
         run: |
           python rsvp.py
