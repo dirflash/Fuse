@@ -290,8 +290,13 @@ def survey_to_mongo(surv_lst, pern_id):
 
 print("Made it to RSVP.py")
 
-for oid in rsvp_list:
-    print(oid)
+print(type(rsvp_list))
+
+nid_list = []
+# nid_list = rsvp_list.split(",")
+
+for nid in rsvp_list:
+    print(nid)
 
 
 """

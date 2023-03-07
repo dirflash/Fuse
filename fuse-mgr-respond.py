@@ -791,7 +791,7 @@ def rsvp_db_upload(nofy_emails_lst, f_day, resp="none"):
         x_name = x["name"]
         x_exist = rsvp_collection.find_one({"name": x_name})
         if bool(x_exist):
-            print(f"{x_name} exists")
+            # print(f"{x_name} exists")
             if x_exist["fuse_date"] != f_day:
                 rsvp_collection.update_one(
                     {"name": x_name}, {"$set": {"fuse_date": f_day}}
@@ -1119,7 +1119,7 @@ def send_rsvps_gh(rsvp_nameid):
     gh_payload = json.dumps(
         {
             "event_type": "FUSE_RSVPs",
-            "client_payload": {"rsvp_nametId": name_id},
+            "client_payload": {"rsvp_nameId": name_id},
         }
     )
 
