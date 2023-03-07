@@ -35,4 +35,4 @@ jobs:
           MONGO_PW : ${{ secrets.MONGO_PW }}
 
         run: |
-          python fuse_send_surveys.py
+          python rsvp.py

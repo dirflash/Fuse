@@ -1091,6 +1091,7 @@ def survey_to_mongo(surv_lst, pern_id):
 
 
 def send_rsvps_gh(rsvp_objid):
+    objid = str(rsvp_objid)
     gh_headers = {
         "Accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
@@ -1099,7 +1100,7 @@ def send_rsvps_gh(rsvp_objid):
     gh_payload = json.dumps(
         {
             "event_type": "FUSE_RSVPs",
-            "client_payload": {"rsvp_objectId": rsvp_objid},
+            "client_payload": {"rsvp_objectId": objid},
         }
     )
 
