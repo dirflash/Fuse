@@ -198,8 +198,6 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
     return r.status_code
 
 
-print("Hello Fuse Manager")
-
 g = survey_collection.find().sort("_id", -1).limit(1)
 for _ in g:
     if str(_["_id"]) == mongo_rec_id:

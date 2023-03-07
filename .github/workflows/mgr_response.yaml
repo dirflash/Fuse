@@ -50,6 +50,7 @@ jobs:
           FUSE_DATE : ${{ github.event.client_payload.fuse_date }}
           GITHUB_PAT: ${{ secrets.FUSE_PAT }}
           SURVEY_COLLECT: ${{ vars.SURVEY_COLLECT }}
+          RSVP_COLLECT: ${{ vars.RSVP_COLLECT }}
 
           # ts: ${{ github.event.client_payload.ts }}
           # room_type: ${{ github.event.client_payload.room_type }}

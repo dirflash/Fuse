@@ -1,0 +1,38 @@
+name: fuse-mgr-response
+
+# Controls when the action will run. Triggers the workflow on push request, or repository dispatch
+on:
+  repository_dispatch:
+    type: [FUSE_RSVPs]
+jobs:
+  build:
+    name: FUSE_RSVPs
+    if: github.event.action == 'FUSE_RSVPs'
+    runs-on: ubuntu-latest
+    environment: fuse_env
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3.3.0
+      - name: setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: 3.10.10
+      - name: setup cache
+        uses: actions/cache@v3.2.6
+        with:
+          path: ~/.cache/pip
+          key: ${{ hashFiles('fuse.py') }}-${{ hashFiles('requirements.txt') }}
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install --upgrade --upgrade-strategy eager -r requirements.txt; fi
+      - name: Run rsvp.py
+        env:
+          rsvp_list: ${{github.event.client_payload.rsvp_objectId}}
+          webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
+          MONGO_ADDR: ${{ vars.MONGO_ADDR }}
+          MONGO_DB : ${{ vars.MONGO_DB }}
+          MONGO_UN : ${{ secrets.MONGO_UN }}
+          MONGO_PW : ${{ secrets.MONGO_PW }}
+
+        run: |
+          python fuse_send_surveys.py

@@ -26,6 +26,7 @@ if os.getenv(KEY):
     response_collect = os.environ["RESPONSE_COLLECT"]
     date_collect = os.environ["DATE_COLLECT"]
     survey_collect = os.environ["SURVEY_COLLECT"]
+    rsvp_collect = os.environ["RSVP_COLLECT"]
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
     fuse_date = os.environ["FUSE_DATE"]
@@ -38,7 +39,7 @@ else:
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "post_survey_send"
+    action = "noncomit_reminders"
     survey_url = "https://www.cisco.com"
     session_date = "2023-03-15"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -47,6 +48,7 @@ else:
     date_collect = config["MONGO"]["DATE_COLLECT"]
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     survey_collect = config["MONGO"]["SURVEY_COLLECT"]
+    rsvp_collect = config["MONGO"]["RSVP_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
@@ -65,6 +67,7 @@ bridge_collection = db[bridge_collect]
 response_collection = db[response_collect]
 date_collection = db[date_collect]
 survey_collection = db[survey_collect]
+rsvp_collection = db[rsvp_collect]
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
@@ -731,54 +734,72 @@ def attend_report(silent_response, confirmed_response, denied_response, email):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
-def report_to_manager(nc, no_nc, email):
+def send_confirmation(nc, nc_emails, no_nc, email):
+    # Need to create confirmation card
     nnc = str(no_nc)
     post_msg = "https://webexapis.com/v1/messages/"
-    pl_title = (
-        f"## Number of noncommited attendees: {nnc}\n\n{nc}\n\n### Sending reminders."
-    )
-    payload = json.dumps(
-        {
-            "toPersonEmail": email,
-            "markdown": pl_title,
-        }
-    )
-    try:
-        post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+
+    for nce in nc_emails:
+        pl_title = f"Hello, {nce}. You haven't confirmed."
+        payload = json.dumps(
+            {
+                "toPersonEmail": email,
+                "markdown": pl_title,
+            }
         )
-        post_msg_r.raise_for_status()
-        print(f"Noncommited List Message sent ({post_msg_r.status_code})")
-    except requests.exceptions.Timeout:
-        print(f"Timeout error. Try again. Line: {sys._getframe().f_lineno}")
-    except requests.exceptions.TooManyRedirects:
-        print("Bad URL")
-    except requests.exceptions.HTTPError as nc_err:
-        raise SystemExit(nc_err) from nc_err
-    except requests.exceptions.RequestException as nc_cat_exception:
-        raise SystemExit(nc_cat_exception) from nc_cat_exception
+        try:
+            post_msg_r = requests.request(
+                "POST", post_msg, headers=headers, data=payload, timeout=2
+            )
+            post_msg_r.raise_for_status()
+            print(f"Noncommited Message sent to {nce} - ({post_msg_r.status_code})")
+        except requests.exceptions.Timeout:
+            print(f"Timeout error. Try again. Line: {sys._getframe().f_lineno}")
+        except requests.exceptions.TooManyRedirects:
+            print("Bad URL")
+        except requests.exceptions.HTTPError as nc_err:
+            raise SystemExit(nc_err) from nc_err
+        except requests.exceptions.RequestException as nc_cat_exception:
+            raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
-def noncomit_reminders(noes):
-    no_rsvp_email = []
+def noncomitted_reminders(no_res):
+    rsvp_dict = {}
+    rsvp_list = []
     print("Requested action: Send Non Committed Reminders")
-    noncommited = noes[
-        (noes["Response"] == "None") & (noes["Attendance"] == "Required Attendee")
+    noncommited = no_res[
+        (no_res["Response"] == "None") & (no_res["Attendance"] == "Required Attendee")
     ]
     num_noncommited = len(noncommited)
     print(f"\nNoncommited Attendees: {num_noncommited}")
-    # The following 3 lines takes the "Full Name" column, converts it to a list, then to
-    # a string to solve formatting issues in the "report_to_manager" function.
+    noncommited_alias = noncommited[["Alias"]]
     noncommited_names = noncommited[["Full Name"]]
-    noncommited_list = noncommited_names["Full Name"].to_list()
-    noncommited_list2str = "\n".join(str(e) for e in noncommited_list)
-    noncommited_alias_lst = noncommited[
-        "Alias"
-    ].values.tolist()  # list of email addresses to send reminder.
-    for _ in noncommited_alias_lst:
-        no_rsvp_email.append(_ + "@cisco.com")
-    report_to_manager(noncommited_list2str, num_noncommited, person_id)
-    return no_rsvp_email
+    noncommited_names_list = noncommited_names["Full Name"].to_list()
+    noncommited_alias_list = noncommited_alias["Alias"].to_list()
+    for x, name in enumerate(noncommited_names_list):
+        rsvp_dict["name"] = name
+        rsvp_dict["email"] = noncommited_alias_list[x] + "@cisco.com"
+        rsvp_list.append(rsvp_dict.copy())
+    return rsvp_list
+
+
+def rsvp_db_upload(nofy_emails_lst, f_day, resp="none"):
+    rec_id = []
+    ts = datetime.now()
+    for x in nofy_emails_lst:
+        record = rsvp_collection.insert_one(
+            {
+                "ts": ts,
+                "fuse_date": f_day,
+                "name": x["name"],
+                "email": x["email"],
+                "response": resp,
+            }
+        )
+        record_id = record.inserted_id
+        rec_id.append(record_id)
+    print(f"Inserted {len(rec_id)} Object IDs")
+    return rec_id
 
 
 def pre_reminder():
@@ -1002,7 +1023,7 @@ def surveys(noes, yesses):
     print(f"Noncommited Attendees: {num_noncommited}")
     print(f"Commited Attendees: {num_commited}")
     # The following 3 lines takes the "Full Name" column, converts it to a list, then to
-    # a string to solve formatting issues in the "report_to_manager" function.
+    # a string to solve formatting issues in the "send_confirmation" function.
     noncommited_names = noncommited[["Full Name"]]
     noncommited_list = noncommited_names["Full Name"].to_list()
     # noncommited_list2str = "\n".join(str(e) for e in noncommited_list)
@@ -1067,6 +1088,36 @@ def survey_to_mongo(surv_lst, pern_id):
     record_id = record.inserted_id
     print(f"Inserted Object ID: {record_id}")
     return str(record_id)
+
+
+def send_rsvps_gh(rsvp_objid):
+    gh_headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+        "Authorization": github_pat,
+    }
+    gh_payload = json.dumps(
+        {
+            "event_type": "FUSE_RSVPs",
+            "client_payload": {"rsvp_objectId": rsvp_objid},
+        }
+    )
+
+    gh_webhook_url = "https://api.github.com/repos/dirflash/fuse/dispatches"
+    try:
+        gh_webhook_response = requests.request(
+            "POST", gh_webhook_url, headers=gh_headers, data=gh_payload, timeout=2
+        )
+        gh_webhook_response.raise_for_status()
+        print(f"Confirmation Message sent ({gh_webhook_response.status_code})")
+    except requests.exceptions.Timeout:
+        print("GitHub Action punt timed out. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
 if person_id in auth_mgrs:
@@ -1142,11 +1193,15 @@ if action != "survey_submit":
     else:
         fuses_date = set_date
 
+
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
     mgr_card(fuses_date)
 elif action == "noncomit_reminders":
-    notify_emails_lst = noncomit_reminders(no_resp)
+    notify_emails_lst = noncomitted_reminders(no_resp)
+    rsvp_db_upload(notify_emails_lst, fuses_date)
+    print("noncomit_reminders set")
+    send_rsvps_gh(rsvp_db_upload)
     mgr_card(fuses_date)
 elif action == "pre_reminder":
     pre_reminder()
