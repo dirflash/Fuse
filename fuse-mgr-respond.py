@@ -1260,6 +1260,8 @@ elif action == "post_survey_send":
     print("Kick off send surveys dispatch")
     send_survey_gh(person_id, first_name, action, session_date, survey_url, mongo_id)
     mgr_card(fuses_date)
+elif action == "rsvp_yes" or action == "rsvp_no":  # Work on this step
+    print(action)
 
 else:
     print("Unknown action.")
