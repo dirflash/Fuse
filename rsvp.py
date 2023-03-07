@@ -246,6 +246,8 @@ def survey_to_mongo(surv_lst, pern_id):
     return str(record_id)
 
 
+print("Made it to RSVP.py")
+
 """
 g = rsvp_collection.find().sort("_id", -1).limit(1)
 for _ in g:
