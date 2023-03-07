@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import json
 import configparser
 import requests
@@ -28,48 +29,7 @@ else:
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     rsvp_collect = config["MONGO"]["RSVP_COLLECT"]
-    rsvp_list = [
-        "Aaron Hagen",
-        "Darrell Lee",
-        "Khoi Pham",
-        "Minh Nguyen",
-        "Derrick Martin",
-        "Jaime Moreno",
-        "Christopher Ronderos",
-        "Robert Jackson",
-        "Sean Huston",
-        "Eric Kalisek",
-        "Wade Vick",
-        "Buddy Mckamey",
-        "Dedra Cannon",
-        "Joe Mejica",
-        "Lester Marquez",
-        "Tung Nguyen",
-        "Nathan Larsen",
-        "Ralph Herr",
-        "Alfredo Jurado",
-        "Keegan Uchacz",
-        "Michael Lipsey",
-        "Raffi Apardian",
-        "Robert Boener",
-        "Julie Palmer",
-        "Majed Alwineyan",
-        "Mike Beller",
-        "Nick Fossen",
-        "Aaron Davis",
-        "Adam Gray",
-        "Justin Damele",
-        "Mike Nipp",
-        "Rob Routt",
-        "Kris Vassallo",
-        "Matt Okuma",
-        "Paul Gately",
-        "Randall Crumm",
-        "John Jackson",
-        "Rama Subramanian",
-        "Brian Lai",
-        "Derron Cyrus",
-    ]
+    rsvp_list = '["Aaron Hagen", "Darrell Lee", "Khoi Pham", "Minh Nguyen", "Derrick Martin", "Jaime Moreno", "Christopher Ronderos", "Robert Jackson", "Sean Huston", "Eric Kalisek", "Wade Vick", "Buddy Mckamey", "Dedra Cannon", "Joe Mejica", "Lester Marquez", "Tung Nguyen", "Nathan Larsen", "Ralph Herr", "Alfredo Jurado", "Keegan Uchacz", "Michael Lipsey", "Raffi Apardian", "Robert Boener", "Julie Palmer", "Majed Alwineyan", "Mike Beller", "Nick Fossen", "Aaron Davis", "Adam Gray", "Justin Damele", "Mike Nipp", "Rob Routt", "Kris Vassallo", "Matt Okuma", "Paul Gately", "Randall Crumm", "John Jackson", "Rama Subramanian", "Brian Lai", "Derron Cyrus"]'
 
 
 MAX_MONGODB_DELAY = 500
@@ -91,8 +51,8 @@ headers = {
 }
 
 
-def send_rsvp(s_date, s_url):
-    body_1 = f"Hello Engineer! We noticed you have not confirmed your availability for the next Fuse session on {s_date}. Your confirmation helps us to plan the pairings."
+def send_rsvp(s_name, s_date):
+    body_1 = f"Hello {s_name}! We noticed you have not confirmed your availability for the next Fuse session on {s_date}. Your confirmation helps us to plan the pairings."
     body_2 = "But not to worry. You can let us know if you will attend by clicking on one of the buttons below. We hope to see you there!"
     send_rsvp_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
@@ -156,6 +116,7 @@ def send_rsvp(s_date, s_url):
                                             "title": "I'll be there!",
                                             "id": "rsvp.yes",
                                             "style": "positive",
+                                            "data": "yes",
                                         }
                                     ],
                                     "horizontalAlignment": "Right",
@@ -174,6 +135,7 @@ def send_rsvp(s_date, s_url):
                                             "title": "Dang it! I can't make it.",
                                             "id": "rsvp.no",
                                             "style": "destructive",
+                                            "data": "no",
                                         }
                                     ],
                                     "horizontalAlignment": "Left",
@@ -190,6 +152,134 @@ def send_rsvp(s_date, s_url):
     return send_rsvp_card
 
 
+def send_rsvp_msg(x_rsvp_card, x_email, x_name):
+    payload = json.dumps(
+        {
+            "toPersonEmail": "aarodavi@cisco.com",  # x_email
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": x_rsvp_card,
+        }
+    )
+    try:
+        pattern = r".{3}(?=@)"
+        anon_email = re.sub(pattern, "xxxx", x_email)
+        print(f"Sending message to {anon_email}")
+        r = requests.request(
+            "POST", post_msg_url, headers=headers, data=payload, timeout=2
+        )
+        if r.status_code == 200:
+            sent_ts = datetime.now()
+            update_rsvp_rec = rsvp_collection.update_one(
+                {"name": x_name}, {"$set": {"reminder_sent": sent_ts}}
+            )
+            if update_rsvp_rec.modified_count == 1:
+                print(f"{anon_email} db record updated with timestamp")
+        if r.status_code == 429:
+            delay_header = r.headers
+            throttle_back(delay_header)
+            return 429
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err) from err
+    except requests.exceptions.RequestException as cat_exception:
+        raise SystemExit(cat_exception) from cat_exception
+
+
+def throttle_back(header_to):
+    if "Retry-After" in header_to:
+        pause_429 = int(header_to["Retry-After"])
+    else:
+        pause_429 = 300
+    print(f"Oh no. Sending too many requests. Pause send for {pause_429} seconds.")
+    sleep(pause_429)
+    return 429
+
+
+def failed_msg_mgr():
+    post_msg = "https://webexapis.com/v1/messages/"
+    pl_title = (
+        "**Something unusual happened sending rsvp messages. Please check the logs.**"
+    )
+    payload = json.dumps(
+        {
+            "toPersonEmail": "aarodavi@cisco.com",  # email,
+            "markdown": pl_title,
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg, headers=headers, data=payload, timeout=2
+        )
+        post_msg_r.raise_for_status()
+        print(f"Failed Message sent ({post_msg_r.status_code})")
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
+print("Made it to RSVP.py")
+
+rsvp_list = rsvp_list.replace("[", "").replace("]", "").replace('"', "")
+rsvp_l_list = rsvp_list.split(", ")
+
+for x in rsvp_l_list:
+    x_exist = rsvp_collection.find_one({"name": x})
+    if bool(x_exist):
+        print(f"Found {x[:-3] + 'xxx'}")
+        rsvp_email = x_exist["email"]
+        rsvp_fuse_date = x_exist["fuse_date"]
+        day_ar = datetime.strptime(rsvp_fuse_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+        rsvp_card = send_rsvp(x, day_ar)
+        throt_back = send_rsvp_msg(rsvp_card, rsvp_email, x)
+        if throt_back == 429:
+            thrott_back = send_rsvp_msg(rsvp_card, rsvp_email, x)
+            print("Requested to throttle back twice. Something is wrong.")
+            failed_msg_mgr()
+
+
+"""
+g = rsvp_collection.find().sort("_id", -1).limit(1)
+for _ in g:
+    if str(_["_id"]) == mongo_rec_id:
+        id_check = True
+        emails = _["survey_lst"]
+        for inx, person in enumerate(emails):
+            inx_plus = inx + 1
+            num_emails = len(emails)
+            msg_stat = send_survey_msgs(
+                inx_plus,
+                person,
+                first_name,
+                num_emails,
+                session_date,
+                survey_url,
+            )
+            if msg_stat == 429:
+                print("Retry send after 429 pause.")
+                msg_stat = send_survey_msgs(
+                    inx_plus,
+                    person,
+                    first_name,
+                    num_emails,
+                    session_date,
+                    survey_url,
+                )
+            print(f"Message sent to {person}: {msg_stat}")
+    else:
+        id_check = False
+        sys.exit(1)
+"""
+
+
+"""
 def noncomit_reminders(noes):
     no_rsvp_email = []
     print("Requested action: Send Non Committed Reminders")
@@ -286,48 +376,4 @@ def survey_to_mongo(surv_lst, pern_id):
     record_id = record.inserted_id
     print(f"Inserted Object ID: {record_id}")
     return str(record_id)
-
-
-print("Made it to RSVP.py")
-
-print(type(rsvp_list))
-
-nid_list = []
-# nid_list = rsvp_list.split(",")
-
-for nid in rsvp_list:
-    print(nid)
-
-
-"""
-g = rsvp_collection.find().sort("_id", -1).limit(1)
-for _ in g:
-    if str(_["_id"]) == mongo_rec_id:
-        id_check = True
-        emails = _["survey_lst"]
-        for inx, person in enumerate(emails):
-            inx_plus = inx + 1
-            num_emails = len(emails)
-            msg_stat = send_survey_msgs(
-                inx_plus,
-                person,
-                first_name,
-                num_emails,
-                session_date,
-                survey_url,
-            )
-            if msg_stat == 429:
-                print("Retry send after 429 pause.")
-                msg_stat = send_survey_msgs(
-                    inx_plus,
-                    person,
-                    first_name,
-                    num_emails,
-                    session_date,
-                    survey_url,
-                )
-            print(f"Message sent to {person}: {msg_stat}")
-    else:
-        id_check = False
-        sys.exit(1)
 """
