@@ -27,7 +27,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install --upgrade --upgrade-strategy eager -r requirements.txt; fi
       - name: Run rsvp.py
         env:
-          rsvp_list: ${{github.event.client_payload.rsvp_objectId}}
+          rsvp_list: ${{github.event.client_payload.rsvp_nameId}}
           webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
           MONGO_ADDR: ${{ vars.MONGO_ADDR }}
           MONGO_DB : ${{ vars.MONGO_DB }}

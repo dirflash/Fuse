@@ -785,6 +785,7 @@ def noncomitted_reminders(no_res):
 
 def rsvp_db_upload(nofy_emails_lst, f_day, resp="none"):
     rec_id = []
+    rec_add = []
     ts = datetime.now()
     for x in nofy_emails_lst:
         x_name = x["name"]
@@ -799,6 +800,7 @@ def rsvp_db_upload(nofy_emails_lst, f_day, resp="none"):
                 rsvp_collection.update_one(
                     {"name": x_name}, {"$set": {"response": resp}}
                 )
+            rec_id.append(x_name)
         else:
             record = rsvp_collection.insert_one(
                 {
@@ -810,11 +812,12 @@ def rsvp_db_upload(nofy_emails_lst, f_day, resp="none"):
                 }
             )
             record_id = record.inserted_id
-            rec_id.append(record_id)
-    if len(rec_id) == 0:
+            rec_id.append(x_name)
+            rec_add.append(record_id)
+    if len(rec_add) == 0:
         print("Inserted no new Object IDs.")
     else:
-        print(f"Inserted {len(rec_id)} Object IDs")
+        print(f"Inserted {len(rec_add)} Object IDs")
     return rec_id
 
 
@@ -1106,8 +1109,8 @@ def survey_to_mongo(surv_lst, pern_id):
     return str(record_id)
 
 
-def send_rsvps_gh(rsvp_objid):
-    objid = str(rsvp_objid)
+def send_rsvps_gh(rsvp_nameid):
+    name_id = str(rsvp_nameid)
     gh_headers = {
         "Accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
@@ -1116,7 +1119,7 @@ def send_rsvps_gh(rsvp_objid):
     gh_payload = json.dumps(
         {
             "event_type": "FUSE_RSVPs",
-            "client_payload": {"rsvp_objectId": objid},
+            "client_payload": {"rsvp_nametId": name_id},
         }
     )
 
@@ -1216,9 +1219,9 @@ if action == "attend_report":
     mgr_card(fuses_date)
 elif action == "noncomit_reminders":
     notify_emails_lst = noncomitted_reminders(no_resp)
-    rsvp_db_upload(notify_emails_lst, fuses_date)
+    recs = rsvp_db_upload(notify_emails_lst, fuses_date)
     print("noncomit_reminders set")
-    send_rsvps_gh(rsvp_db_upload)
+    send_rsvps_gh(recs)
     mgr_card(fuses_date)
 elif action == "pre_reminder":
     pre_reminder()
