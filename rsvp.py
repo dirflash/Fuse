@@ -116,7 +116,7 @@ def send_rsvp(s_name, s_date):
                                             "title": "I'll be there!",
                                             "id": "rsvp.yes",
                                             "style": "positive",
-                                            "data": "rsvp.yes",
+                                            "rsvp_answer": "rsvp.yes",
                                         }
                                     ],
                                     "horizontalAlignment": "Right",
@@ -135,7 +135,7 @@ def send_rsvp(s_name, s_date):
                                             "title": "Dang it! I can't make it.",
                                             "id": "rsvp.no",
                                             "style": "destructive",
-                                            "data": "rsvp.no",
+                                            "rsvp_answer": "rsvp.no",
                                         }
                                     ],
                                     "horizontalAlignment": "Left",
