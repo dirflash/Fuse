@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import re
 import configparser
 import requests
 import pandas as pd
@@ -15,6 +16,7 @@ if os.getenv(KEY):
     print("Running as GitHub Action.")
     webex_bearer = os.environ["webex_bearer"]
     person_id = os.environ["person_id"]
+    person_name = os.environ["person_name"]
     first_name = os.environ["first_name"]
     action = os.environ["action"]
     survey_url = os.environ["survey_url"]
@@ -31,6 +33,8 @@ if os.getenv(KEY):
     mongo_pw = os.environ["MONGO_PW"]
     fuse_date = os.environ["FUSE_DATE"]
     github_pat = os.environ["GITHUB_PAT"]
+    rsvp_response = os.environ["rsvp_response"]
+    fuse_rsvp_date = os.environ["fuse_rsvp_date"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
@@ -38,8 +42,9 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
+    person_name = "Bob Smith"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "noncomit_reminders"
+    action = "rsvp_yes"
     survey_url = "https://www.cisco.com"
     session_date = "2023-03-15"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -53,6 +58,9 @@ else:
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
     github_pat = config["DEFAULT"]["FUSE_PAT"]
+    rsvp_response = "rsvp.yes"
+    fuse_rsvp_date = "04-08-2023"
+
 
 MAX_MONGODB_DELAY = 500
 
@@ -1140,6 +1148,28 @@ def send_rsvps_gh(rsvp_nameid):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
+def rsvp_to_mongo(pn_id, pn_name, fus_date, act):
+    ts = datetime.now()
+    r_exist = response_collection.find_one({"pn_name": pn_name, "fuse_date": fus_date})
+    if bool(r_exist):
+        print("record exists")
+    else:
+        record = response_collection.insert_one(
+            {
+                "ts": ts,
+                "person_email": pn_id,
+                "pn_name": pn_name,
+                "fuse_date": fus_date,
+                "response": act,
+            }
+        )
+        if bool(record.inserted_id) is True:
+            anon_name = re.sub(r".{3}$", "xxx", pn_name)
+            record_id = record.inserted_id
+            print(f"ObjectId {str(record_id)} created for {anon_name}")
+            return
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
 else:
@@ -1213,6 +1243,7 @@ if action != "survey_submit":
     else:
         fuses_date = set_date
 
+print(f"Action: {action}")
 
 if action == "attend_report":
     attend_report(no_resp, yes_respond, declined_respond, person_id)
@@ -1260,8 +1291,8 @@ elif action == "post_survey_send":
     print("Kick off send surveys dispatch")
     send_survey_gh(person_id, first_name, action, session_date, survey_url, mongo_id)
     mgr_card(fuses_date)
-elif action == "rsvp_yes" or action == "rsvp_no":  # Work on this step
-    print(action)
+elif action == "rsvp_yes" or action == "rsvp_no":
+    rsvp_to_mongo(person_id, person_name, fuse_rsvp_date, rsvp_response)
 
 else:
     print("Unknown action.")
