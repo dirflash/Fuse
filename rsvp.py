@@ -54,6 +54,8 @@ headers = {
 def send_rsvp(s_name, s_date):
     body_1 = f"Hello {s_name}! We noticed you have not confirmed your availability for the next Fuse session on {s_date}. Your confirmation helps us to plan the pairings."
     body_2 = "But not to worry. You can let us know if you will attend by clicking on one of the buttons below. We hope to see you there!"
+    y_meta_data = f"[rsvp.yes, {s_date}]"
+    n_meta_data = f"[rsvp.no, {s_date}]"
     send_rsvp_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
         "content": {
@@ -116,7 +118,7 @@ def send_rsvp(s_name, s_date):
                                             "title": "I'll be there!",
                                             "id": "rsvp.yes",
                                             "style": "positive",
-                                            "data": "rsvp.yes",
+                                            "data": y_meta_data,
                                         }
                                     ],
                                     "horizontalAlignment": "Right",
@@ -135,7 +137,7 @@ def send_rsvp(s_name, s_date):
                                             "title": "Dang it! I can't make it.",
                                             "id": "rsvp.no",
                                             "style": "destructive",
-                                            "data": "rsvp.no",
+                                            "data": n_meta_data,
                                         }
                                     ],
                                     "horizontalAlignment": "Left",
