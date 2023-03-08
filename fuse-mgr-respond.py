@@ -44,7 +44,7 @@ else:
     first_name = "Bob"
     person_name = "Bob Smith"
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "rsvp_yes"
+    action = "rsvp.yes"
     survey_url = "https://www.cisco.com"
     session_date = "2023-03-15"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -1291,7 +1291,7 @@ elif action == "post_survey_send":
     print("Kick off send surveys dispatch")
     send_survey_gh(person_id, first_name, action, session_date, survey_url, mongo_id)
     mgr_card(fuses_date)
-elif action == "rsvp_yes" or action == "rsvp_no":
+elif action == "rsvp.yes" or action == "rsvp.no":
     rsvp_to_mongo(person_id, person_name, fuse_rsvp_date, rsvp_response)
 
 else:
