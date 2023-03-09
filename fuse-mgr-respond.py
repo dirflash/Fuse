@@ -6,7 +6,7 @@ import configparser
 import requests
 import pandas as pd
 import certifi
-from pymongo import MongoClient, DESCENDING
+from pymongo import MongoClient, DESCENDING, errors
 from datetime import datetime
 
 # import validators
@@ -1150,21 +1150,36 @@ def send_rsvps_gh(rsvp_nameid):
 
 def rsvp_to_mongo(pn_id, pn_name, fus_date, act):
     ts = datetime.now()
-    r_exist = response_collection.find_one({"pn_name": pn_name, "fuse_date": fus_date})
-    if bool(r_exist):
-        print("record exists")
+    anon_name = re.sub(r".{3}$", "xxx", pn_name)
+    r_exist = response_collection.find({"pn_name": pn_name, fus_date: {"$exists": 1}})
+    r_exist_cnt = response_collection.count_documents(
+        {"pn_name": pn_name, fus_date: {"$exists": 1}}
+    )
+    if r_exist_cnt > 0:
+        for entry in r_exist:
+            print("record exists")
+            if entry[fus_date] == act:
+                print("Response hasn't changed.")
+            else:
+                print("Updated response. Change record.")
+                try:
+                    update_rsvp_rec = response_collection.update_one(
+                        {"pn_name": pn_name}, {"$set": {fus_date: act}}
+                    )
+                    if update_rsvp_rec.modified_count == 1:
+                        print(f"{anon_name} db record updated with new response")
+                except errors.OperationFailure as op_fail:
+                    print(f"rsvp_to_mongo update failure ({op_fail}) for {anon_name}.")
     else:
         record = response_collection.insert_one(
             {
                 "ts": ts,
                 "person_email": pn_id,
                 "pn_name": pn_name,
-                "fuse_date": fus_date,
-                "response": act,
+                fus_date: act,
             }
         )
         if bool(record.inserted_id) is True:
-            anon_name = re.sub(r".{3}$", "xxx", pn_name)
             record_id = record.inserted_id
             print(f"ObjectId {str(record_id)} created for {anon_name}")
             return
@@ -1297,4 +1312,5 @@ elif action == "rsvp.yes" or action == "rsvp.no":
 else:
     print("Unknown action.")
     failed_msg(person_id)
-    mgr_card(fuses_date)
+    if person_id in auth_mgrs:
+        mgr_card(fuses_date)
