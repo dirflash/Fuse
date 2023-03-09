@@ -288,6 +288,7 @@ if TEST is True:
 
 for x in rsvp_l_list:
     x_exist = rsvp_collection.find_one({"name": x})
+    print(f"x_exist: {x_exist}")
     if bool(x_exist):
         print(f"Found {x[:-3] + 'xxx'}")
         rsvp_email = x_exist["email"]
@@ -301,5 +302,6 @@ for x in rsvp_l_list:
             failed_msg_mgr()
             sys.exit(1)
     else:
+        print("Didn't find record in db.")
         failed_msg_mgr()
         sys.exit(1)
