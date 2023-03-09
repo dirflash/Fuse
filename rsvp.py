@@ -9,6 +9,8 @@ from pymongo import MongoClient
 from datetime import datetime
 from time import sleep
 
+TEST = True
+
 KEY = "CI"
 if os.getenv(KEY):
     print("Running as GitHub Action.")
@@ -231,6 +233,11 @@ print("Made it to RSVP.py")
 
 rsvp_list = rsvp_list.replace("[", "").replace("]", "").replace('"', "")
 rsvp_l_list = rsvp_list.split(", ")
+
+
+rsvp_list_cnt = len(rsvp_l_list)
+if TEST is True:
+    del rsvp_l_list[5:]
 
 for x in rsvp_l_list:
     x_exist = rsvp_collection.find_one({"name": x})
