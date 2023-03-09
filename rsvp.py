@@ -287,6 +287,7 @@ if TEST is True:
     del rsvp_l_list[5:]
 
 for x in rsvp_l_list:
+    print(f"Name: {x}")
     x_exist = rsvp_collection.find_one({"name": x})
     print(f"x_exist: {x_exist}")
     if bool(x_exist):
