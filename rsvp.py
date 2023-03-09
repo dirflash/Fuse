@@ -276,10 +276,11 @@ def failed_msg_mgr():
 
 print("Made it to RSVP.py")
 
-# rsvp_list = rsvp_list.replace("[", "").replace("]", "").replace('"', "")
-# rsvp_l_list = rsvp_list.split(", ")
-
-rsvp_l_list = rsvp_list
+if type(rsvp_list) == str:
+    rsvp_list = rsvp_list.replace("[", "").replace("]", "").replace('"', "")
+    rsvp_l_list = rsvp_list.split(", ")
+else:
+    rsvp_l_list = rsvp_list
 
 rsvp_list_cnt = len(rsvp_l_list)
 if TEST is True:
