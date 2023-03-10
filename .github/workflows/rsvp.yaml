@@ -1,4 +1,4 @@
-name: fuse-rsvp_manager
+name: fuse_rsvp_manager
 
 # Controls when the action will run. Triggers the workflow on push request, or repository dispatch
 on:

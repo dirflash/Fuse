@@ -1,4 +1,4 @@
-name: fuse-send-surveys
+name: fuse_send_surveys
 
 # Controls when the action will run. Triggers the workflow on push request, or repository dispatch
 on:
