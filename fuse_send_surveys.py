@@ -29,10 +29,10 @@ else:
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
-    first_name = "Bob"
-    action = "survey_submit"
+    first_name = ""
+    action = "post_survey_submit"
     survey_url = "https://www.cisco.com"
-    session_date = "2023-03-15"
+    session_date = "2023-03-18"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     mongo_un = config["MONGO"]["MONGO_UN"]
