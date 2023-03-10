@@ -36,6 +36,7 @@ jobs:
           auth_mgrs: ${{ secrets.auth_mgrs }}
           ts: ${{ github.event.client_payload.ts }}
           attachment: ${{ github.event.client_payload.attachment }}
+          msg_txt: ${{ github.event.client_payload.msg_txt}}
           MONGO_ADDR: ${{ vars.MONGO_ADDR }}
           MONGO_DB : ${{ vars.MONGO_DB }}
           BRIDGE_COLLECT : ${{ vars.BRIDGE_COLLECT }}
