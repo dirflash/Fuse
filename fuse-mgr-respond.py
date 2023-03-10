@@ -35,6 +35,7 @@ if os.getenv(KEY):
     github_pat = os.environ["GITHUB_PAT"]
     rsvp_response = os.environ["rsvp_response"]
     fuse_rsvp_date = os.environ["fuse_rsvp_date"]
+    msg_txt = os.environ["msg_txt"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
@@ -60,6 +61,7 @@ else:
     github_pat = config["DEFAULT"]["FUSE_PAT"]
     rsvp_response = ""
     fuse_rsvp_date = ""
+    msg_txt = ""
 
 
 MAX_MONGODB_DELAY = 500
@@ -1187,8 +1189,12 @@ def rsvp_to_mongo(pn_id, pn_name, fus_date, act):
 
 if person_id in auth_mgrs:
     print("Authorized manager.")
+    if msg_txt != "":
+        set_date = get_fuse_date(date_collection)
+        mgr_card(set_date)
+        sys.exit()
 else:
-    print("Not an authorized manager.")
+    print("At the moment, I only accept requests from authorized managers.")
     not_authd_mgr(person_id)
     sys.exit()
 
