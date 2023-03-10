@@ -54,6 +54,7 @@ jobs:
           RSVP_COLLECT: ${{ vars.RSVP_COLLECT }}
           rsvp_response: ${{ github.event.client_payload.rsvp_response }}
           fuse_rsvp_date: ${{ github.event.client_payload.rsvp_date_fuse }}
+          msg_txt: ${{ github.event.client_payload.msg_txt}}
 
           # ts: ${{ github.event.client_payload.ts }}
           # room_type: ${{ github.event.client_payload.room_type }}
