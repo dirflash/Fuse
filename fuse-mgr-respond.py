@@ -1275,8 +1275,6 @@ elif action == "pre_reminder":
 elif action == "survey_msg":
     sur_card = survey_submit_card()
     survey_msg(sur_card, person_id)
-    if person_id in auth_mgrs:
-        mgr_card(fuses_date)
 elif action == "fuse_date":
     if fuse_date == "NA":
         print("Send change date card")
