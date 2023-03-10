@@ -247,9 +247,9 @@ for x in rsvp_l_list:
     print(x)
     try:
         x_exist_cnt = rsvp_collection.count_documents({"name": x})
-        print(f"x_exist_cnt: {x_exist_cnt}")
+        # print(f"x_exist_cnt: {x_exist_cnt}")
         x_exist = rsvp_collection.find_one({"name": x})
-        print(f"x_exist: {x_exist}")
+        # print(f"x_exist: {x_exist}")
         anon_per = re.sub(r".{3}$", "xxx", x)
         print(f"Found {anon_per}")
         rsvp_email = x_exist["email"]
@@ -266,32 +266,3 @@ for x in rsvp_l_list:
         print("Didn't find record in db.")
         failed_msg_mgr()
         sys.exit(1)
-
-    # ------------------------------------
-"""
-
-    r_exist = response_collection.find({"pn_name": pn_name, fus_date: {"$exists": 1}})
-    r_exist_cnt = response_collection.count_documents(
-        {"pn_name": pn_name, fus_date: {"$exists": 1}}
-    )
-
-
-    x_exist = rsvp_collection.find_one({"name": x})
-    print(f"x_exist: {x_exist}")
-    if bool(x_exist):
-        print(f"Found {x[:-3] + 'xxx'}")
-        rsvp_email = x_exist["email"]
-        rsvp_fuse_date = x_exist["fuse_date"]
-        day_ar = datetime.strptime(rsvp_fuse_date, "%Y-%m-%d").strftime("%m-%d-%Y")
-        rsvp_card = send_rsvp(x, day_ar)
-        throt_back = send_rsvp_msg(rsvp_card, rsvp_email, x)
-        if throt_back == 429:
-            thrott_back = send_rsvp_msg(rsvp_card, rsvp_email, x)
-            print("Requested to throttle back twice. Something is wrong.")
-            failed_msg_mgr()
-            sys.exit(1)
-    else:
-        print("Didn't find record in db.")
-        failed_msg_mgr()
-        sys.exit(1)
-"""
