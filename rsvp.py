@@ -287,6 +287,7 @@ if TEST is True:
     del rsvp_l_list[5:]
 
 for x in rsvp_l_list:
+    print(x)
     try:
         x_exist_cnt = rsvp_collection.count_documents({"name": x})
         print(f"x_exist_cnt: {x_exist_cnt}")
