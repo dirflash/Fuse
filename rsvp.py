@@ -31,48 +31,7 @@ else:
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     rsvp_collect = config["MONGO"]["RSVP_COLLECT"]
-    rsvp_list = [
-        "Aaron Hagen",
-        "Darrell Lee",
-        "Khoi Pham",
-        "Minh Nguyen",
-        "Derrick Martin",
-        "Jaime Moreno",
-        "Christopher Ronderos",
-        "Robert Jackson",
-        "Sean Huston",
-        "Eric Kalisek",
-        "Wade Vick",
-        "Buddy Mckamey",
-        "Dedra Cannon",
-        "Joe Mejica",
-        "Lester Marquez",
-        "Tung Nguyen",
-        "Nathan Larsen",
-        "Ralph Herr",
-        "Alfredo Jurado",
-        "Keegan Uchacz",
-        "Michael Lipsey",
-        "Raffi Apardian",
-        "Robert Boener",
-        "Julie Palmer",
-        "Majed Alwineyan",
-        "Mike Beller",
-        "Nick Fossen",
-        "Aaron Davis",
-        "Adam Gray",
-        "Justin Damele",
-        "Mike Nipp",
-        "Rob Routt",
-        "Kris Vassallo",
-        "Matt Okuma",
-        "Paul Gately",
-        "Randall Crumm",
-        "John Jackson",
-        "Rama Subramanian",
-        "Brian Lai",
-        "Derron Cyrus",
-    ]
+    rsvp_list = "['Aaron Hagen', 'Darrell Lee', 'Khoi Pham', 'Minh Nguyen', 'Derrick Martin', 'Jaime Moreno', 'Christopher Ronderos', 'Robert Jackson', 'Sean Huston', 'Eric Kalisek', 'Wade Vick', 'Buddy Mckamey', 'Dedra Cannon', 'Joe Mejica', 'Lester Marquez', 'Tung Nguyen', 'Nathan Larsen', 'Ralph Herr', 'Alfredo Jurado', 'Keegan Uchacz', 'Michael Lipsey', 'Raffi Apardian', 'Robert Boener', 'Julie Palmer', 'Majed Alwineyan', 'Mike Beller', 'Nick Fossen', 'Aaron Davis', 'Adam Gray', 'Justin Damele', 'Mike Nipp', 'Rob Routt', 'Kris Vassallo', 'Matt Okuma', 'Paul Gately', 'Randall Crumm', 'John Jackson', 'Rama Subramanian', 'Brian Lai', 'Derron Cyrus']"
 
     """
     rsvp_list = '["Aaron Hagen", "Darrell Lee", "Khoi Pham", "Minh Nguyen", "Derrick Martin", "Jaime Moreno", "Christopher Ronderos", "Robert Jackson", "Sean Huston", "Eric Kalisek", "Wade Vick", "Buddy Mckamey", "Dedra Cannon", "Joe Mejica", "Lester Marquez", "Tung Nguyen", "Nathan Larsen", "Ralph Herr", "Alfredo Jurado", "Keegan Uchacz", "Michael Lipsey", "Raffi Apardian", "Robert Boener", "Julie Palmer", "Majed Alwineyan", "Mike Beller", "Nick Fossen", "Aaron Davis", "Adam Gray", "Justin Damele", "Mike Nipp", "Rob Routt", "Kris Vassallo", "Matt Okuma", "Paul Gately", "Randall Crumm", "John Jackson", "Rama Subramanian", "Brian Lai", "Derron Cyrus"]'
@@ -277,8 +236,10 @@ def failed_msg_mgr():
 print("Made it to RSVP.py")
 
 if isinstance(rsvp_list, str):
-    rsvp_list = rsvp_list.replace("[", "").replace("]", "").replace('"', "")
+    rsvp_list = rsvp_list.replace("[", "").replace("]", "").replace("'", "")
+    print(f"rsvp_list:\n{rsvp_list}")
     rsvp_l_list = rsvp_list.split(", ")
+    print(f"rsvp_l_list:\n{rsvp_l_list}")
 else:
     rsvp_l_list = rsvp_list
 

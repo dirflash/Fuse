@@ -42,11 +42,11 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
-    person_name = "Bob Smith"
+    person_name = ""
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "rsvp.yes"
-    survey_url = "https://www.cisco.com"
-    session_date = "2023-03-15"
+    action = "noncomit_reminders"
+    survey_url = "NA"
+    session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -58,8 +58,8 @@ else:
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
     github_pat = config["DEFAULT"]["FUSE_PAT"]
-    rsvp_response = "rsvp.yes"
-    fuse_rsvp_date = "04-08-2023"
+    rsvp_response = ""
+    fuse_rsvp_date = ""
 
 
 MAX_MONGODB_DELAY = 500
