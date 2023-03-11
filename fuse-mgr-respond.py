@@ -63,7 +63,7 @@ else:
     github_pat = config["DEFAULT"]["FUSE_PAT"]
     rsvp_response = ""
     fuse_rsvp_date = ""
-    msg_txt = ""
+    msg_txt = "a"
 
 
 MAX_MONGODB_DELAY = 500

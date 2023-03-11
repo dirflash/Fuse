@@ -21,7 +21,9 @@ KEY = "CI"
 if os.getenv(KEY):
     print("Running as GitHub Action.")
     webex_bearer = os.environ["webex_bearer"]
+    msg_txt = os.environ["msg_txt"]
     person_email = os.environ["person_email"]
+    person_guid = os.environ["person_guid"]
     auth_mgrs = os.environ["auth_mgrs"]
     mongo_addr = os.environ["MONGO_ADDR"]
     mongo_db = os.environ["MONGO_DB"]
@@ -37,7 +39,9 @@ else:
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
+    msg_txt = "a"
     person_email = config["DEFAULT"]["person_email"]
+    person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
@@ -366,18 +370,17 @@ else:
     not_authd_mgr(person_email)
     sys.exit()
 
-# Add Mongo record with data file, person_un, ts
-print(attachment)
-print(person_email)
-print(ts)
+if msg_txt != "":
+    record = bridge_collection.insert_one(
+        {"ts": ts, "person_email": person_email, "attachment": attachment}
+    )
+    record_id = record.inserted_id
+    print(f"Inserted Object ID: {record_id}")
 
-record = bridge_collection.insert_one(
-    {"ts": ts, "person_email": person_email, "attachment": attachment}
-)
-record_id = record.inserted_id
-print(f"Inserted Object ID: {record_id}")
-
-fix_ts(record_id, ts)
+    fix_ts(record_id, ts)
+else:
+    print("Manual request for manager interface.")
+    print("Skip bridge record add.")
 
 set_date = get_fuse_date(date_collection)
 if set_date == "NA":
