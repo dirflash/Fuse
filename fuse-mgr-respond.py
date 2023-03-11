@@ -18,6 +18,7 @@ if os.getenv(KEY):
     person_id = os.environ["person_id"]
     person_name = os.environ["person_name"]
     first_name = os.environ["first_name"]
+    person_guid = os.environ["person_guid"]
     action = os.environ["action"]
     survey_url = os.environ["survey_url"]
     session_date = os.environ["session_date"]
@@ -44,10 +45,11 @@ else:
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
     person_name = ""
+    person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "noncomit_reminders"
-    survey_url = "NA"
-    session_date = "NA"
+    action = "post_survey_send"
+    survey_url = "2023-03-24"
+    session_date = "https://www.cisco.com"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -1072,7 +1074,7 @@ def surveys(noes, yesses):
     return survey_email
 
 
-def send_survey_gh(p_id, f_name, act, sess_date, surv_url, mong_id):
+def send_survey_gh(p_id, f_name, p_guid, act, sess_date, surv_url, mong_id):
     gh_headers = {
         "Accept": "application/vnd.github.v3+json",
         "Content-Type": "application/json",
@@ -1084,6 +1086,7 @@ def send_survey_gh(p_id, f_name, act, sess_date, surv_url, mong_id):
             "client_payload": {
                 "person_id": p_id,
                 "first_name": f_name,
+                "person_guid": p_guid,
                 "action": act,
                 "session_date": sess_date,
                 "survey_url": surv_url,
@@ -1109,10 +1112,15 @@ def send_survey_gh(p_id, f_name, act, sess_date, surv_url, mong_id):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
-def survey_to_mongo(surv_lst, pern_id):
+def survey_to_mongo(surv_lst, pern_id, p_guid):
     ts = datetime.now()
     record = survey_collection.insert_one(
-        {"ts": ts, "person_email": pern_id, "survey_lst": surv_lst}
+        {
+            "ts": ts,
+            "person_email": pern_id,
+            "person_guid": p_guid,
+            "survey_lst": surv_lst,
+        }
     )
     record_id = record.inserted_id
     print(f"Inserted Object ID: {record_id}")
@@ -1274,6 +1282,7 @@ elif action == "noncomit_reminders":
     recs = rsvp_db_upload(notify_emails_lst, fuses_date)
     print("noncomit_reminders set")
     send_rsvps_gh(recs)
+    # -- add mgr notification that we will kick off the reminders -- #
     mgr_card(fuses_date)
 elif action == "pre_reminder":
     pre_reminder()
@@ -1306,10 +1315,13 @@ elif action == "survey_submit":  # Need to validate survey_url here.
 elif action == "post_survey_send":
     print("Post Survey Send")
     survey_lst = surveys(no_resp, yes_respond)
-    mongo_id = survey_to_mongo(survey_lst, person_id)
+    mongo_id = survey_to_mongo(survey_lst, person_id, person_guid)
     print(f"Total number of surveys to send: {len(survey_lst)}")
     print("Kick off send surveys dispatch")
-    send_survey_gh(person_id, first_name, action, session_date, survey_url, mongo_id)
+    send_survey_gh(
+        person_id, first_name, person_guid, action, session_date, survey_url, mongo_id
+    )
+    # -- add mgr notification that we will kick off the reminders -- #
     mgr_card(fuses_date)
 elif action == "rsvp.yes" or action == "rsvp.no":
     rsvp_to_mongo(person_id, person_name, fuse_rsvp_date, rsvp_response)

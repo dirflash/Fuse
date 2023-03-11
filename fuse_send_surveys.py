@@ -14,6 +14,7 @@ if os.getenv(KEY):
     webex_bearer = os.environ["webex_bearer"]
     person_id = os.environ["person_id"]
     first_name = os.environ["first_name"]
+    person_guid = os.environ["person_guid"]
     action = os.environ["action"]
     survey_url = os.environ["survey_url"]
     session_date = os.environ["session_date"]
@@ -30,15 +31,16 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
     first_name = ""
-    action = "post_survey_submit"
+    person_guid = config["DEFAULT"]["person_guid"]
+    action = "post_survey_send"
     survey_url = "https://www.cisco.com"
-    session_date = "2023-03-18"
+    session_date = "2023-03-24"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     survey_collect = config["MONGO"]["SURVEY_COLLECT"]
-    mongo_rec_id = "64024221675d400353cc17c4"
+    mongo_rec_id = "640bbbab5d332f700d4d2ff3"
 
 MAX_MONGODB_DELAY = 500
 
@@ -200,7 +202,7 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
 
 g = survey_collection.find().sort("_id", -1).limit(1)
 for _ in g:
-    if str(_["_id"]) == mongo_rec_id:
+    if str(_["person_guid"]) == "person_guid":
         id_check = True
         emails = _["survey_lst"]
         for inx, person in enumerate(emails):
