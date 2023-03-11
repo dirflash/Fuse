@@ -90,6 +90,7 @@ headers = {
 
 RAW_FILE_NAME = ""
 NONCOMMITED_LST = []
+kill_switch = False
 
 
 def manager_card(set_date):
@@ -1200,11 +1201,16 @@ if person_id in auth_mgrs:
     if msg_txt != "":
         set_date = get_fuse_date(date_collection)
         mgr_card(set_date)
+        kill_switch = True
         sys.exit()
 else:
     print("At the moment, I only accept requests from authorized managers.")
     not_authd_mgr(person_id)
     sys.exit()
+
+if kill_switch is True:
+    print("Hit the kill switch.")
+    sys.exit(1)
 
 chat_id, chat_email, chat_url = chat_record(person_id)
 
