@@ -203,6 +203,7 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
 g = survey_collection.find().sort("_id", -1).limit(1)
 for _ in g:
     if str(_["person_guid"]) == person_guid:
+        print(f"Found record ...{person_guid[len(person_guid) - 8:]}")
         id_check = True
         emails = _["survey_lst"]
         for inx, person in enumerate(emails):
