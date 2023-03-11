@@ -23,7 +23,7 @@ if os.getenv(KEY):
     survey_collect = os.environ["SURVEY_COLLECT"]
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
-    mongo_rec_id = os.environ["mongo_id"]
+    # mongo_rec_id = os.environ["mongo_id"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
@@ -40,7 +40,7 @@ else:
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     survey_collect = config["MONGO"]["SURVEY_COLLECT"]
-    mongo_rec_id = "640bbbab5d332f700d4d2ff3"
+    # mongo_rec_id = "640bbbab5d332f700d4d2ff3"
 
 MAX_MONGODB_DELAY = 500
 
@@ -202,7 +202,7 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
 
 g = survey_collection.find().sort("_id", -1).limit(1)
 for _ in g:
-    if str(_["person_guid"]) == "person_guid":
+    if str(_["person_guid"]) == person_guid:
         id_check = True
         emails = _["survey_lst"]
         for inx, person in enumerate(emails):
