@@ -47,9 +47,9 @@ else:
     person_name = ""
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "post_survey_send"
-    survey_url = "2023-03-24"
-    session_date = "https://www.cisco.com"
+    action = "survey_msg"
+    survey_url = "NA"
+    session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
     mongo_db = config["MONGO"]["MONGO_DB"]
     bridge_collect = config["MONGO"]["BRIDGE_COLLECT"]
@@ -947,7 +947,7 @@ def chat_record(per_id):
     for _ in recent_chat:
         doc_id = {"_id": _["_id"]}
         doc_per_email = _["person_email"]
-        doc_attach_url = _["attachment"]
+        doc_attach_url = _["attachment"]  # --- Sometimes there is no attachment?
         print(f"Found most recent request from {doc_per_email}...")
         print(f"with attachment URL: {doc_attach_url}")
     return (doc_id, doc_per_email, doc_attach_url)

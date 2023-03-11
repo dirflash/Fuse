@@ -30,6 +30,7 @@ jobs:
           webex_bearer: ${{ secrets.ENV_WEBEX_BEARER }}
           person_id: ${{ github.event.client_payload.person_id }}
           first_name: ${{ github.event.client_payload.first_name }}
+          person_guid: ${{ github.event.client_payload.person_guid}}
           action: ${{ github.event.client_payload.action }}
           session_date: ${{ github.event.client_payload.session_date }}
           survey_url: ${{ github.event.client_payload.survey_url }}
