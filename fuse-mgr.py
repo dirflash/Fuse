@@ -370,7 +370,7 @@ else:
     not_authd_mgr(person_email)
     sys.exit()
 
-if msg_txt != "":
+if msg_txt == "":
     record = bridge_collection.insert_one(
         {"ts": ts, "person_email": person_email, "attachment": attachment}
     )
