@@ -202,15 +202,8 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
 
 
 print(f"mongo_rec_id: {mongo_rec_id}")
+
 g = survey_collection.find({"_id": ObjectId(mongo_rec_id)})
-
-"""
-g = survey_collection.find(
-    {"_id", ObjectId(mongo_rec_id)}
-)  # survey_collection.find().sort("_id", -1).limit(1)
-
-# -- change to find_one as GUID (send over the _id)
-"""
 
 for _ in g:
     if str(_["person_guid"]) == person_guid:
