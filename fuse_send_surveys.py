@@ -201,6 +201,7 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
     return r.status_code
 
 
+print(f"mongo_rec_id: {mongo_rec_id}")
 g = survey_collection.find({"_id": ObjectId(mongo_rec_id)})
 
 """
