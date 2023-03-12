@@ -5,6 +5,7 @@ import configparser
 import requests
 import certifi
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 from datetime import datetime
 from time import sleep
 
@@ -23,7 +24,7 @@ if os.getenv(KEY):
     survey_collect = os.environ["SURVEY_COLLECT"]
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
-    # mongo_rec_id = os.environ["mongo_id"]
+    mongo_rec_id = os.environ["mongo_id"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
@@ -40,7 +41,7 @@ else:
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     survey_collect = config["MONGO"]["SURVEY_COLLECT"]
-    # mongo_rec_id = "640bbbab5d332f700d4d2ff3"
+    mongo_rec_id = "640d1ebe1b724590dca8c3ed"
 
 MAX_MONGODB_DELAY = 500
 
@@ -200,7 +201,16 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
     return r.status_code
 
 
-g = survey_collection.find().sort("_id", -1).limit(1)
+g = survey_collection.find({"_id": ObjectId(mongo_rec_id)})
+
+"""
+g = survey_collection.find(
+    {"_id", ObjectId(mongo_rec_id)}
+)  # survey_collection.find().sort("_id", -1).limit(1)
+
+# -- change to find_one as GUID (send over the _id)
+"""
+
 for _ in g:
     if str(_["person_guid"]) == person_guid:
         print(f"Found record ...{person_guid[len(person_guid) - 8:]}")
@@ -230,4 +240,5 @@ for _ in g:
             print(f"Message sent to {person}: {msg_stat}")
     else:
         id_check = False
+        print("Failed db record lookup.")
         sys.exit(1)
