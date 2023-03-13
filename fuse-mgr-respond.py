@@ -48,7 +48,7 @@ else:
     person_name = "Bob Smith"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "rsvp.yes"
+    action = "pre_reminder"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -63,7 +63,7 @@ else:
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
     github_pat = config["DEFAULT"]["FUSE_PAT"]
-    rsvp_response = "[rsvp.yes, 03-18-2023]"
+    rsvp_response = ""
     fuse_rsvp_date = ""
     msg_txt = ""
 
@@ -693,6 +693,90 @@ def send_survey(s_date, s_url):
         },
     }
     return send_survey_card
+
+
+def pre_event_card(pre_name):
+    pre_msg = f"Hello, {pre_name}! We look forward to another great FUSE session on Friday. THANK YOU for participating and contributing to the strengthening of the best group of SAs at Cisco."
+    send_preevent_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+            "body": [
+                {
+                    "type": "ImageSet",
+                    "images": [
+                        {
+                            "type": "Image",
+                            "size": "Medium",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
+                        }
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Fuse Bot Mission Control",
+                            "wrap": True,
+                            "horizontalAlignment": "Center",
+                            "fontType": "Monospace",
+                            "size": "Large",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": "Fuse Session Reminder",
+                            "wrap": True,
+                            "spacing": "Medium",
+                            "horizontalAlignment": "Center",
+                            "fontType": "Monospace",
+                            "size": "Medium",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": pre_msg,
+                            "wrap": True,
+                            "fontType": "Monospace",
+                            "weight": "Bolder",
+                        },
+                    ],
+                },
+            ],
+        },
+    }
+    return send_preevent_card
+
+
+def pre_event_notification(prev_email, prevent_card):
+    print("Proof confirmation.")
+    post_msg = "https://webexapis.com/v1/messages/"
+    payload = json.dumps(
+        {
+            "toPersonEmail": "aarodavi@cisco.com",  # prev_email,           # --- change when ready to pull the pin
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": prevent_card,
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg, headers=headers, data=payload, timeout=2
+        )
+        post_msg_r.raise_for_status()
+        print(f"Confirmation Message sent ({post_msg_r.status_code})")
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
 def post_survey_msg(p_s_c, pers_id):
@@ -1414,6 +1498,12 @@ elif action == "noncomit_reminders":
     mgr_card(fuses_date)
 elif action == "pre_reminder":
     send_to = pre_reminder(fuses_date)
+    for peeps in send_to:
+        pr_email = peeps["email"]
+        pr_name = peeps["name"]
+        pr_f_name = pr_name.split(" ", 1)[0]
+        pe_card = pre_event_card(pr_f_name)
+        pre_event_notification(pr_email, pe_card)
     # -- send pre-reminder messages -- #
     mgr_card(fuses_date)
 elif action == "survey_msg":
