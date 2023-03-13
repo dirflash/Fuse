@@ -768,7 +768,8 @@ def pre_event_notification(prev_email, prevent_card):
             "POST", post_msg, headers=headers, data=payload, timeout=2
         )
         post_msg_r.raise_for_status()
-        print(f"Confirmation Message sent ({post_msg_r.status_code})")
+        anon_email = re.sub(r".{3}$", "xxx", prev_email)
+        print(f"Confirmation Message sent ({post_msg_r.status_code}) to {anon_email}")
     except requests.exceptions.Timeout:
         print("Timeout error. Try again.")
     except requests.exceptions.TooManyRedirects:
