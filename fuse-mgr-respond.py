@@ -768,7 +768,7 @@ def pre_event_notification(prev_email, prevent_card):
             "POST", post_msg, headers=headers, data=payload, timeout=2
         )
         post_msg_r.raise_for_status()
-        anon_email = re.sub(r".{3}$", "xxx", prev_email)
+        anon_email = re.sub(r"\w{3}(?=@)", "xxx", prev_email)
         print(f"Confirmation Message sent ({post_msg_r.status_code}) to {anon_email}")
     except requests.exceptions.Timeout:
         print("Timeout error. Try again.")
@@ -1499,13 +1499,15 @@ elif action == "noncomit_reminders":
     mgr_card(fuses_date)
 elif action == "pre_reminder":
     send_to = pre_reminder(fuses_date)
+    m_cnt = 0
     for peeps in send_to:
+        m_cnt += 1
         pr_email = peeps["email"]
         pr_name = peeps["name"]
         pr_f_name = pr_name.split(" ", 1)[0]
         pe_card = pre_event_card(pr_f_name)
         pre_event_notification(pr_email, pe_card)
-    # -- send pre-reminder messages -- #
+    print(f"Attempted to send {str(m_cnt)} pre-event message reminders.")
     mgr_card(fuses_date)
 elif action == "survey_msg":
     sur_card = survey_submit_card()
