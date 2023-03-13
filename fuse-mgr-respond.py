@@ -48,7 +48,7 @@ else:
     person_name = "Bob Smith"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "pre_reminder"
+    action = "attend_report"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -753,6 +753,194 @@ def pre_event_card(pre_name):
     return send_preevent_card
 
 
+def fix_lst(part_list):
+    parts = []
+    for nme in part_list:
+        name_person = nme["name"]
+        parts.append(name_person)
+    parts_substr = str(parts)
+    parts_substr = (
+        parts_substr.replace("[", "")
+        .replace("]", "")
+        .replace("'", "")
+        .replace(", ", "\n")
+    )
+    return parts_substr
+
+
+def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
+    maybes_substr = fix_lst(m_lst)
+    noes_substr = fix_lst(n_lst)
+    yes_substr = fix_lst(y_lst)
+    day_f = datetime.strptime(f_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    report_subhead = f"Attendee Report for {day_f}"
+    attendance_report = f"Number of noncommitted attendees: {no_none}\nNumber of confirmed attendees: {no_yes}\nNumber of declined attendees: {no_no}"
+    send_attend_report_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+            "body": [
+                {
+                    "type": "ImageSet",
+                    "images": [
+                        {
+                            "type": "Image",
+                            "size": "Medium",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
+                        }
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Fuse Bot Mission Control",
+                            "wrap": True,
+                            "horizontalAlignment": "Center",
+                            "fontType": "Monospace",
+                            "size": "Large",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": report_subhead,
+                            "wrap": True,
+                            "horizontalAlignment": "Center",
+                            "fontType": "Monospace",
+                            "size": "Medium",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": attendance_report,
+                            "wrap": True,
+                            "horizontalAlignment": "Left",
+                            "fontType": "Monospace",
+                            "size": "Small",
+                            "weight": "Bolder",
+                        },
+                    ],
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "ActionSet",
+                                    "actions": [
+                                        {
+                                            "type": "Action.ShowCard",
+                                            "title": "Accepted",
+                                            "card": {
+                                                "type": "AdaptiveCard",
+                                                "body": [
+                                                    {
+                                                        "type": "TextBlock",
+                                                        "text": yes_substr,
+                                                        "size": "Small",
+                                                        "wrap": False,
+                                                    }
+                                                ],
+                                            },
+                                        }
+                                    ],
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "ActionSet",
+                                    "actions": [
+                                        {
+                                            "type": "Action.ShowCard",
+                                            "title": "Declined",
+                                            "card": {
+                                                "type": "AdaptiveCard",
+                                                "body": [
+                                                    {
+                                                        "type": "TextBlock",
+                                                        "text": noes_substr,
+                                                        "size": "Small",
+                                                        "wrap": False,
+                                                    }
+                                                ],
+                                            },
+                                        }
+                                    ],
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "ActionSet",
+                                    "actions": [
+                                        {
+                                            "type": "Action.ShowCard",
+                                            "title": "Noncommitted",
+                                            "card": {
+                                                "type": "AdaptiveCard",
+                                                "body": [
+                                                    {
+                                                        "type": "TextBlock",
+                                                        "text": maybes_substr,
+                                                        "size": "Small",
+                                                        "wrap": False,
+                                                    }
+                                                ],
+                                            },
+                                        }
+                                    ],
+                                }
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
+    }
+    return send_attend_report_card
+
+
+def attend_report_msg(ar_card, p_id):
+    post_msg = "https://webexapis.com/v1/messages/"
+    payload = json.dumps(
+        {
+            "toPersonEmail": p_id,
+            "markdown": "Adaptive card response. Open message on a supported client to respond.",
+            "attachments": ar_card,
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg, headers=headers, data=payload, timeout=2
+        )
+        post_msg_r.raise_for_status()
+        anon_email = re.sub(r"\w{3}(?=@)", "xxx", p_id)
+        print(f"Confirmation Message sent ({post_msg_r.status_code}) to {anon_email}")
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
 def pre_event_notification(prev_email, prevent_card):
     print("Proof confirmation.")
     post_msg = "https://webexapis.com/v1/messages/"
@@ -801,37 +989,6 @@ def post_survey_msg(p_s_c, pers_id):
     except requests.exceptions.RequestException as cat_exception:
         raise SystemExit(cat_exception) from cat_exception
     return r
-
-
-def attend_report(silent_response, confirmed_response, denied_response, email):
-    pl_title = (
-        "Number of noncommited attendees: "
-        + str(len(silent_response))
-        + "\nNumber of confirmed attendees: "
-        + str(len(confirmed_response))
-        + "\nNumber of declined attendees: "
-        + str(len(denied_response))
-    )
-    payload = json.dumps(
-        {
-            "toPersonEmail": email,
-            "markdown": pl_title,
-        }
-    )
-    try:
-        post_msg_r = requests.request(
-            "POST", post_msg_url, headers=headers, data=payload, timeout=2
-        )
-        post_msg_r.raise_for_status()
-        print(f"Attendance Report Message sent ({post_msg_r.status_code})")
-    except requests.exceptions.Timeout:
-        print("Timeout error. Try again.")
-    except requests.exceptions.TooManyRedirects:
-        print("Bad URL")
-    except requests.exceptions.HTTPError as nc_err:
-        raise SystemExit(nc_err) from nc_err
-    except requests.exceptions.RequestException as nc_cat_exception:
-        raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
 def send_confirmation(nc, nc_emails, no_nc, email):
@@ -1398,6 +1555,25 @@ def status_records(x_lst, setting):
                 )
 
 
+def on_it_message(person_id):
+    on_it_msg = "That process has been kicked off and will take a couple of minutes to complete."
+    on_it_payload = json.dumps({"toPersonEmail": person_id, "markdown": on_it_msg})
+    try:
+        on_it_note = requests.request(
+            "POST", post_msg_url, headers=headers, data=on_it_payload, timeout=2
+        )
+        on_it_note.raise_for_status()
+        print(f"On it message sent ({on_it_note.status_code})")
+    except requests.exceptions.Timeout:
+        print("On it message timed out. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
     if msg_txt != "":
@@ -1488,14 +1664,20 @@ status_records(yes_lst, "Accepted")
 print(f"Action: {action}")
 
 if action == "attend_report":
-    attend_report(no_resp, yes_respond, declined_respond, person_id)
+    num_none = len(no_resp)
+    num_yes = len(yes_respond)
+    num_no = len(declined_respond)
+    att_rep_card = attend_report_card(
+        maybe_lst, no_lst, yes_lst, fuses_date, num_none, num_yes, num_no
+    )
+    attend_report_msg(att_rep_card, person_id)
     mgr_card(fuses_date)
 elif action == "noncomit_reminders":
     notify_emails_lst = noncomitted_reminders(no_resp)
     recs = rsvp_db_upload(notify_emails_lst, fuses_date)
     print("noncomit_reminders set")
     send_rsvps_gh(recs)
-    # -- add mgr notification that we will kick off the reminders -- #
+    on_it_message(person_id)
     mgr_card(fuses_date)
 elif action == "pre_reminder":
     send_to = pre_reminder(fuses_date)
@@ -1543,7 +1725,7 @@ elif action == "post_survey_send":
     send_survey_gh(
         person_id, first_name, person_guid, action, session_date, survey_url, mongo_id
     )
-    # -- add mgr notification that we will kick off the reminders -- #
+    on_it_message(person_id)
     mgr_card(fuses_date)
 elif action == "rsvp.yes" or action == "rsvp.no":
     rsvp_to_mongo(person_id, person_name, fuse_rsvp_date, rsvp_response)
