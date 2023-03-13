@@ -47,6 +47,7 @@ jobs:
           BRIDGE_COLLECT : ${{ vars.BRIDGE_COLLECT }}
           RESPONSE_COLLECT : ${{ vars.RESPONSE_COLLECT }}
           DATE_COLLECT : ${{ vars.DATE_COLLECT }}
+          STATUS_COLLECT : ${{ vars.STATUS_COLLECT }}
           MONGO_UN : ${{ secrets.MONGO_UN }}
           MONGO_PW : ${{ secrets.MONGO_PW }}
           FUSE_DATE : ${{ github.event.client_payload.fuse_date }}

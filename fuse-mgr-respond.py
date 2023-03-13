@@ -30,6 +30,7 @@ if os.getenv(KEY):
     date_collect = os.environ["DATE_COLLECT"]
     survey_collect = os.environ["SURVEY_COLLECT"]
     rsvp_collect = os.environ["RSVP_COLLECT"]
+    status_collect = os.environ["STATUS_COLLECT"]
     mongo_un = os.environ["MONGO_UN"]
     mongo_pw = os.environ["MONGO_PW"]
     fuse_date = os.environ["FUSE_DATE"]
@@ -44,10 +45,10 @@ else:
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
     first_name = "Bob"
-    person_name = ""
+    person_name = "Bob Smith"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "survey_msg"
+    action = "rsvp.yes"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -57,13 +58,14 @@ else:
     response_collect = config["MONGO"]["RESPONSE_COLLECT"]
     survey_collect = config["MONGO"]["SURVEY_COLLECT"]
     rsvp_collect = config["MONGO"]["RSVP_COLLECT"]
+    status_collect = config["MONGO"]["STATUS_COLLECT"]
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
     github_pat = config["DEFAULT"]["FUSE_PAT"]
-    rsvp_response = ""
+    rsvp_response = "[rsvp.yes, 03-18-2023]"
     fuse_rsvp_date = ""
-    msg_txt = "a"
+    msg_txt = ""
 
 
 MAX_MONGODB_DELAY = 500
@@ -80,6 +82,7 @@ response_collection = db[response_collect]
 date_collection = db[date_collect]
 survey_collection = db[survey_collect]
 rsvp_collection = db[rsvp_collect]
+status_collection = db[status_collect]
 
 post_msg_url = "https://webexapis.com/v1/messages/"
 
@@ -833,8 +836,20 @@ def rsvp_db_upload(nofy_emails_lst, f_day, resp="none"):
     return rec_id
 
 
-def pre_reminder():
+def pre_reminder(f_date):
+    send_dict = {}
+    send_list = []
     print("Pre Event Reminders")
+    r_exist = status_collection.find({"fuse_date": f_date, "status": "Accepted"})
+    r_exist_cnt = status_collection.count_documents(
+        {"fuse_date": f_date, "status": "Accepted"}
+    )
+    for r_e in r_exist:
+        send_dict["name"] = r_e["name"]
+        send_dict["email"] = r_e["email"]
+        send_list.append(send_dict.copy())
+    print(f"Created pre_reminder list for {len(send_list)} attendees.")
+    return send_list
 
 
 def survey_msg(s_card, email):
@@ -1195,6 +1210,109 @@ def rsvp_to_mongo(pn_id, pn_name, fus_date, act):
             return
 
 
+def maybe_rsvps(maybe_r, r_ts, fuse_d):
+    print("Create list of no responses")
+    maybe_go_dict = {}
+    status_list = []
+    maybe_goes = maybe_r[
+        (maybe_r["Response"] == "None") & (maybe_r["Attendance"] == "Required Attendee")
+    ]
+    maybe_go_alias = maybe_goes[["Alias"]]
+    no_go_alias_lst = maybe_go_alias["Alias"].to_list()
+    maybe_go_name = maybe_goes[["Full Name"]]
+    maybe_go_name_lst = maybe_go_name["Full Name"].to_list()
+    for idx, name in enumerate(maybe_go_name_lst):
+        maybe_go_dict["name"] = name
+        maybe_go_dict["email"] = no_go_alias_lst[idx] + "@cisco.com"
+        maybe_go_dict["status"] = "None"
+        maybe_go_dict["fuse_date"] = fuse_d
+        maybe_go_dict["ts"] = r_ts
+        status_list.append(maybe_go_dict.copy())
+    print(f"Number of no responses: {len(status_list)}")
+    return status_list
+
+
+def no_rsvps(no_r, r_ts, fuse_d):
+    print("Create list of declined responses")
+    no_go_dict = {}
+    status_list = []
+    no_goes = no_r[
+        (no_r["Response"] == "Declined") & (no_r["Attendance"] == "Required Attendee")
+    ]
+    no_go_alias = no_goes[["Alias"]]
+    no_go_alias_lst = no_go_alias["Alias"].to_list()
+    no_go_name = no_goes[["Full Name"]]
+    no_go_name_lst = no_go_name["Full Name"].to_list()
+    for idx, name in enumerate(no_go_name_lst):
+        no_go_dict["name"] = name
+        no_go_dict["email"] = no_go_alias_lst[idx] + "@cisco.com"
+        no_go_dict["status"] = "Declined"
+        no_go_dict["fuse_date"] = fuse_d
+        no_go_dict["ts"] = r_ts
+        status_list.append(no_go_dict.copy())
+    print(f"Number of declined responses: {len(status_list)}")
+    return status_list
+
+
+def yes_rsvps(yes_r, r_ts, fuse_d):
+    print("Create list of accepted responses")
+    yes_go_dict = {}
+    status_list = []
+    yes_goes = yes_r[
+        (yes_r["Response"] == "Accepted") & (yes_r["Attendance"] == "Required Attendee")
+    ]
+    yes_go_alias = yes_goes[["Alias"]]
+    yes_go_alias_lst = yes_go_alias["Alias"].to_list()
+    yes_go_name = yes_goes[["Full Name"]]
+    yes_go_name_lst = yes_go_name["Full Name"].to_list()
+    for idx, name in enumerate(yes_go_name_lst):
+        yes_go_dict["name"] = name
+        yes_go_dict["email"] = yes_go_alias_lst[idx] + "@cisco.com"
+        yes_go_dict["status"] = "Accepted"
+        yes_go_dict["fuse_date"] = fuse_d
+        yes_go_dict["ts"] = r_ts
+        status_list.append(yes_go_dict.copy())
+    print(f"Number of accepted responses: {len(status_list)}")
+    return status_list
+
+
+def status_records(x_lst, setting):
+    print(f"Update status records for {setting}.")
+    for x in x_lst:
+        name = x["name"]
+        email = x["email"]
+        status = x["status"]
+        fuse_date = x["fuse_date"]
+        ts = x["ts"]
+        anon_name = re.sub(r".{3}$", "xxx", name)
+        r_exist = status_collection.find({"name": name, "fuse_date": fuse_date})
+        r_exist_cnt = status_collection.count_documents(
+            {"name": name, "fuse_date": fuse_date}
+        )
+        if r_exist_cnt > 0:
+            for r in r_exist:
+                if status != r["status"]:
+                    print("Status does not match for {r['_id']}. Updating...")
+                    status_collection.update_one(
+                        {"name": name}, {"$set": {"status": status}}
+                    )
+        else:
+            record = status_collection.insert_one(
+                {
+                    "name": name,
+                    "email": email,
+                    "status": status,
+                    "fuse_date": fuse_date,
+                    "ts": ts,
+                }
+            )
+            if bool(record.inserted_id) is True:
+                record_id = record.inserted_id
+                print(
+                    f"ObjectId {str(record_id)} created for {anon_name} in status collection"
+                )
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
     if msg_txt != "":
@@ -1260,6 +1378,7 @@ no_resp, yes_respond, declined_respond = responses(df2)
 # print(f"yes_respond: \n {yes_respond}\n")
 # print(f"declined_respond: \n {declined_respond}\n")
 
+
 print(f"Requested action: {action}")
 
 if action != "survey_submit":
@@ -1272,6 +1391,14 @@ if action != "survey_submit":
         os._exit(1)
     else:
         fuses_date = set_date
+
+rsvp_ts = datetime.now()
+maybe_lst = maybe_rsvps(no_resp, rsvp_ts, fuses_date)
+no_lst = no_rsvps(declined_respond, rsvp_ts, fuses_date)
+yes_lst = yes_rsvps(yes_respond, rsvp_ts, fuses_date)
+status_records(maybe_lst, "Unknown")
+status_records(no_lst, "Declined")
+status_records(yes_lst, "Accepted")
 
 print(f"Action: {action}")
 
@@ -1286,7 +1413,8 @@ elif action == "noncomit_reminders":
     # -- add mgr notification that we will kick off the reminders -- #
     mgr_card(fuses_date)
 elif action == "pre_reminder":
-    pre_reminder()
+    send_to = pre_reminder(fuses_date)
+    # -- send pre-reminder messages -- #
     mgr_card(fuses_date)
 elif action == "survey_msg":
     sur_card = survey_submit_card()
@@ -1326,7 +1454,21 @@ elif action == "post_survey_send":
     mgr_card(fuses_date)
 elif action == "rsvp.yes" or action == "rsvp.no":
     rsvp_to_mongo(person_id, person_name, fuse_rsvp_date, rsvp_response)
-
+    update_lst = []
+    update_dict = {}
+    update_dict["name"] = person_name
+    update_dict["email"] = person_id
+    if action == "rsvp.yes":
+        update_dict["status"] = "Accepted"
+        update_response = "Accepted"
+    else:
+        update_dict["status"] = "Declined"
+        update_response = "Declined"
+    update_dict["fuse_date"] = fuse_rsvp_date
+    update_dict["ts"] = datetime.now()
+    update_lst.append(update_dict.copy())
+    print(update_lst)
+    status_records(update_lst, update_response)
 else:
     print("Unknown action.")
     failed_msg(person_id)
