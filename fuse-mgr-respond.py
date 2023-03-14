@@ -1653,7 +1653,6 @@ if action != "survey_submit":
     else:
         fuses_date = set_date
 
-"""
 rsvp_ts = datetime.now()
 maybe_lst = maybe_rsvps(no_resp, rsvp_ts, fuses_date)
 no_lst = no_rsvps(declined_respond, rsvp_ts, fuses_date)
@@ -1661,7 +1660,6 @@ yes_lst = yes_rsvps(yes_respond, rsvp_ts, fuses_date)
 status_records(maybe_lst, "Unknown")
 status_records(no_lst, "Declined")
 status_records(yes_lst, "Accepted")
-"""
 
 print(f"Action: {action}")
 
@@ -1669,6 +1667,7 @@ if action == "attend_report":
     num_none = len(no_resp)
     num_yes = len(yes_respond)
     num_no = len(declined_respond)
+    # --- Instead of doing this, pull rsvp status from Response collection
     att_rep_card = attend_report_card(
         maybe_lst, no_lst, yes_lst, fuses_date, num_none, num_yes, num_no
     )
@@ -1742,7 +1741,7 @@ elif action == "rsvp.yes" or action == "rsvp.no":
     rsvp_date_un = str(rsvp_package[1])
     rsvp_date = rsvp_date_un.split("-")
     rsvp_d = str(rsvp_date[2]) + "-" + str(rsvp_date[0]) + "-" + str(rsvp_date[1])
-    rsvp_to_mongo(person_id, person_name, rsvp_d, action)
+    rsvp_to_mongo(person_id, person_name, rsvp_d, action)  # Response Collection
     update_lst = []
     update_dict = {}
     update_dict["name"] = person_name
@@ -1757,7 +1756,7 @@ elif action == "rsvp.yes" or action == "rsvp.no":
     update_dict["ts"] = datetime.now()
     update_lst.append(update_dict.copy())
     print(update_lst)
-    status_records(update_lst, update_response)
+    # status_records(update_lst, update_response)
 else:
     print("Unknown action.")
     failed_msg(person_id)
