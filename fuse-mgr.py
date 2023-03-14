@@ -39,7 +39,7 @@ else:
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
-    msg_txt = "a"
+    msg_txt = ""
     person_email = config["DEFAULT"]["person_email"]
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]

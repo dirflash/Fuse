@@ -48,7 +48,7 @@ else:
     person_name = "Bob Smith"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "attend_report"
+    action = "rsvp.yes"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -63,7 +63,7 @@ else:
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
     github_pat = config["DEFAULT"]["FUSE_PAT"]
-    rsvp_response = ""
+    rsvp_response = "[rsvp.yes, 03-25-2023]"
     fuse_rsvp_date = ""
     msg_txt = ""
 
@@ -1653,6 +1653,7 @@ if action != "survey_submit":
     else:
         fuses_date = set_date
 
+"""
 rsvp_ts = datetime.now()
 maybe_lst = maybe_rsvps(no_resp, rsvp_ts, fuses_date)
 no_lst = no_rsvps(declined_respond, rsvp_ts, fuses_date)
@@ -1660,6 +1661,7 @@ yes_lst = yes_rsvps(yes_respond, rsvp_ts, fuses_date)
 status_records(maybe_lst, "Unknown")
 status_records(no_lst, "Declined")
 status_records(yes_lst, "Accepted")
+"""
 
 print(f"Action: {action}")
 
@@ -1728,7 +1730,19 @@ elif action == "post_survey_send":
     on_it_message(person_id)
     mgr_card(fuses_date)
 elif action == "rsvp.yes" or action == "rsvp.no":
-    rsvp_to_mongo(person_id, person_name, fuse_rsvp_date, rsvp_response)
+    rsvp_package = []
+    rsvp_date = []
+    rsvp_respond = (
+        rsvp_response.replace("[", "")
+        .replace("]", "")
+        .replace("'", "")
+        .replace(", ", ",")
+    )
+    rsvp_package = rsvp_respond.split(",")
+    rsvp_date_un = str(rsvp_package[1])
+    rsvp_date = rsvp_date_un.split("-")
+    rsvp_d = str(rsvp_date[2]) + "-" + str(rsvp_date[0]) + "-" + str(rsvp_date[1])
+    rsvp_to_mongo(person_id, person_name, rsvp_d, action)
     update_lst = []
     update_dict = {}
     update_dict["name"] = person_name
@@ -1739,7 +1753,7 @@ elif action == "rsvp.yes" or action == "rsvp.no":
     else:
         update_dict["status"] = "Declined"
         update_response = "Declined"
-    update_dict["fuse_date"] = fuse_rsvp_date
+    update_dict["fuse_date"] = rsvp_d
     update_dict["ts"] = datetime.now()
     update_lst.append(update_dict.copy())
     print(update_lst)
