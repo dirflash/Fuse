@@ -1826,7 +1826,22 @@ if action == "attend_report":
         attend_report_msg(srrc, person_id)
     else:
         print("No responses")
-    mgr_card(fuses_date)
+        pl_title = "**No participant updates from Fuse bot.**"
+        payload = json.dumps(
+            {
+                "toPersonEmail": person_id,
+                "markdown": pl_title,
+            }
+        )
+        try:
+            post_msg_r = requests.request(
+                "POST", post_msg_url, headers=headers, data=payload, timeout=3
+            )
+            post_msg_r.raise_for_status()
+            print(f"No participant updates message sent ({post_msg_r.status_code})")
+        except requests.exceptions.Timeout:
+            print("Timeout error. Try again.")
+        mgr_card(fuses_date)
 elif action == "noncomit_reminders":
     notify_emails_lst = noncomitted_reminders(no_resp)
     recs = rsvp_db_upload(notify_emails_lst, fuses_date)
