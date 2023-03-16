@@ -21,6 +21,7 @@ if os.getenv(KEY):
     mongo_pw = os.environ["MONGO_PW"]
     rsvp_collect = os.environ["RSVP_COLLECT"]
     rsvp_list = os.environ["rsvp_list"]
+    person_id = os.environ["person_id"]
 else:
     print("Running locally.")
     config = configparser.ConfigParser()
@@ -31,6 +32,7 @@ else:
     mongo_un = config["MONGO"]["MONGO_UN"]
     mongo_pw = config["MONGO"]["MONGO_PW"]
     rsvp_collect = config["MONGO"]["RSVP_COLLECT"]
+    person_id = config["DEFAULT"]["person_id"]
     rsvp_list = str(
         [
             "Aaron Hagen",
@@ -208,14 +210,14 @@ def throttle_back(header_to):
     return 429
 
 
-def failed_msg_mgr():
+def failed_msg_mgr(p_id):
     post_msg = "https://webexapis.com/v1/messages/"
     pl_title = (
         "**Something unusual happened sending rsvp messages. Please check the logs.**"
     )
     payload = json.dumps(
         {
-            "toPersonEmail": "aarodavi@cisco.com",  # ---- Need to fix this to send to send to mgr
+            "toPersonEmail": p_id,
             "markdown": pl_title,
         }
     )
@@ -263,7 +265,7 @@ for x in rsvp_l_list:
         if throt_back == 429:
             thrott_back = send_rsvp_msg(rsvp_card, rsvp_email, x)
             print("Requested to throttle back twice. Something is wrong.")
-            failed_msg_mgr()
+            failed_msg_mgr(person_id)
             sys.exit(1)
     except:
         print("Didn't find record in db.")

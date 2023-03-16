@@ -34,6 +34,7 @@ jobs:
           MONGO_UN : ${{ secrets.MONGO_UN }}
           MONGO_PW : ${{ secrets.MONGO_PW }}
           RSVP_COLLECT: ${{ vars.RSVP_COLLECT }}
+          person_id: ${{ github.event.client_payload.person_id }}
 
         run: |
           python rsvp.py
