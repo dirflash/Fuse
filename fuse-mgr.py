@@ -39,7 +39,7 @@ else:
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
-    msg_txt = ""
+    msg_txt = "?"
     person_email = config["DEFAULT"]["person_email"]
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
@@ -339,6 +339,30 @@ def get_fuse_date(date_dbcollection):
     return time_value
 
 
+def help_me(p_id):
+    print("Somebody has a question.")
+    herder_payload = json.dumps(
+        {
+            "toPersonEmail": p_id,
+            "markdown": "Got a question? Need to report a bot problem? Contact the bot herders [here](webexteams://im?space=7a97b910-c443-11ed-9a0a-47c2acdafc72).",
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg_url, headers=headers, data=herder_payload, timeout=3
+        )
+        post_msg_r.raise_for_status()
+        print(f"Confirmation Message sent ({post_msg_r.status_code})")
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
 MAX_MONGODB_DELAY = 500
 
 Mongo_Client = MongoClient(
@@ -362,6 +386,11 @@ headers = {
     "Authorization": webex_bearer,
     "Content-Type": "application/json",
 }
+
+
+if msg_txt == "?":
+    help_me(person_email)
+    sys.exit()
 
 if person_email in auth_mgrs:
     print("Authorized manager.")
