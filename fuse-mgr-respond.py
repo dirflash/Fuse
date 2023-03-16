@@ -48,7 +48,7 @@ else:
     person_name = "Bob Smith"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "rsvp.yes"
+    action = "attend_report"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -63,7 +63,7 @@ else:
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
     github_pat = config["DEFAULT"]["FUSE_PAT"]
-    rsvp_response = "[rsvp.yes, 03-25-2023]"
+    rsvp_response = ""
     fuse_rsvp_date = ""
     msg_txt = ""
 
@@ -102,31 +102,68 @@ def manager_card(set_date):
             "type": "AdaptiveCard",
             "body": [
                 {
-                    "type": "ColumnSet",
-                    "columns": [
+                    "type": "ImageSet",
+                    "images": [
                         {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Image",
-                                    "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
-                                    "height": "100px",
-                                    "width": "400px",
-                                }
-                            ],
+                            "type": "Image",
+                            "size": "Medium",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
                         }
                     ],
                 },
                 {
-                    "type": "TextBlock",
-                    "text": "Fuse Bot Mission Control",
-                    "wrap": True,
-                    "horizontalAlignment": "Center",
-                    "fontType": "Monospace",
-                    "size": "Large",
-                    "color": "Default",
-                    "weight": "Bolder",
-                    "spacing": "Small",
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Fuse Bot Mission Control",
+                            "wrap": True,
+                            "horizontalAlignment": "Center",
+                            "fontType": "Monospace",
+                            "size": "Large",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": "What can I do for you?",
+                            "wrap": True,
+                            "horizontalAlignment": "Left",
+                            "fontType": "Monospace",
+                            "size": "Medium",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "Input.ChoiceSet",
+                            "choices": [
+                                {"title": "Set Date", "value": "fuse_date"},
+                                {"title": "Attendee Report", "value": "attend_report"},
+                                {
+                                    "title": "RSVP Requests",
+                                    "value": "noncomit_reminders",
+                                },
+                                {
+                                    "title": "Pre-FUSE Reminders",
+                                    "value": "pre_reminder",
+                                },
+                                {"title": "Survey Message", "value": "survey_msg"},
+                            ],
+                            "id": "Action_Choice",
+                        },
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "First step: Set or verify the FUSE date. Then upload a CSV of calendar invite tracking data.",
+                            "wrap": True,
+                            "fontType": "Monospace",
+                            "weight": "Bolder",
+                        }
+                    ],
                 },
                 {
                     "type": "ColumnSet",
@@ -137,10 +174,11 @@ def manager_card(set_date):
                             "items": [
                                 {
                                     "type": "TextBlock",
-                                    "text": "What can I do for you?",
+                                    "text": set_date,
                                     "wrap": True,
-                                    "horizontalAlignment": "Center",
-                                    "size": "Medium",
+                                    "fontType": "Monospace",
+                                    "size": "Small",
+                                    "weight": "Bolder",
                                 }
                             ],
                         },
@@ -149,74 +187,18 @@ def manager_card(set_date):
                             "width": "stretch",
                             "items": [
                                 {
-                                    "type": "Input.ChoiceSet",
-                                    "choices": [
+                                    "type": "ActionSet",
+                                    "actions": [
                                         {
-                                            "title": "Set Date",
-                                            "value": "fuse_date",
-                                            "wrap": True,
-                                        },
-                                        {
-                                            "title": "Attendee Report",
-                                            "value": "attend_report",
-                                        },
-                                        {
-                                            "title": "Send RSVP Reminder",
-                                            "value": "noncomit_reminders",
-                                        },
-                                        {
-                                            "title": "Send Pre FUSE Reminders",
-                                            "value": "pre_reminder",
-                                        },
-                                        {
-                                            "title": "Send Survey Message",
-                                            "value": "survey_msg",
-                                        },
+                                            "type": "Action.Submit",
+                                            "title": "Submit",
+                                            "id": "submit",
+                                        }
                                     ],
-                                    "id": "Action_Choice",
+                                    "horizontalAlignment": "Right",
                                 }
                             ],
                         },
-                    ],
-                },
-                {
-                    "type": "Container",
-                    "items": [
-                        {
-                            "type": "ColumnSet",
-                            "columns": [
-                                {
-                                    "type": "Column",
-                                    "width": "stretch",
-                                    "items": [
-                                        {
-                                            "type": "TextBlock",
-                                            "text": set_date,
-                                            "horizontalAlignment": "Center",
-                                            "fontType": "Monospace",
-                                            "color": "Warning",
-                                            "wrap": True,
-                                        },
-                                    ],
-                                },
-                                {
-                                    "type": "Column",
-                                    "width": "stretch",
-                                    "items": [
-                                        {
-                                            "type": "ActionSet",
-                                            "actions": [
-                                                {
-                                                    "type": "Action.Submit",
-                                                    "title": "Submit",
-                                                }
-                                            ],
-                                            "horizontalAlignment": "Right",
-                                        }
-                                    ],
-                                },
-                            ],
-                        }
                     ],
                 },
             ],
@@ -773,7 +755,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
     noes_substr = fix_lst(n_lst)
     yes_substr = fix_lst(y_lst)
     day_f = datetime.strptime(f_date, "%Y-%m-%d").strftime("%m-%d-%Y")
-    report_subhead = f"Attendee Report for {day_f}"
+    report_subhead = f"Attendee Report from CSV for {day_f}"
     attendance_report = f"Number of noncommitted attendees: {no_none}\nNumber of confirmed attendees: {no_yes}\nNumber of declined attendees: {no_no}"
     send_attend_report_card = {
         "contentType": "application/vnd.microsoft.card.adaptive",
@@ -939,6 +921,144 @@ def attend_report_msg(ar_card, p_id):
         raise SystemExit(nc_err) from nc_err
     except requests.exceptions.RequestException as nc_cat_exception:
         raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
+def self_resp_str_fix(part):
+    parts_substr = str(part)
+    parts_substr = (
+        parts_substr.replace("[", "")
+        .replace("]", "")
+        .replace("'", "")
+        .replace(", ", "\n")
+    )
+    return parts_substr
+
+
+def self_resp_report_card(n_lst, y_lst, f_date):
+    if len(n_lst) > 0:
+        noes_substr = self_resp_str_fix(n_lst)
+    else:
+        noes_substr = ""
+    if len(y_lst) > 0:
+        yes_substr = self_resp_str_fix(y_lst)
+    else:
+        yes_substr = ""
+    no_cnt = str(len(n_lst))
+    yes_cnt = str(len(y_lst))
+    day_f = datetime.strptime(f_date, "%Y-%m-%d").strftime("%m-%d-%Y")
+    report_subhead = f"Bot Attendee Report\nResponses for {day_f}"
+    attendance_report = f"Number of confirmed attendees: {yes_cnt}\nNumber of declined attendees: {no_cnt}"
+    send_resp_card = {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "content": {
+            "type": "AdaptiveCard",
+            "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+            "version": "1.2",
+            "body": [
+                {
+                    "type": "ImageSet",
+                    "images": [
+                        {
+                            "type": "Image",
+                            "size": "Medium",
+                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "height": "100px",
+                            "width": "400px",
+                        }
+                    ],
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Fuse Bot Mission Control",
+                    "wrap": True,
+                    "fontType": "Monospace",
+                    "size": "Large",
+                    "weight": "Bolder",
+                    "horizontalAlignment": "Center",
+                },
+                {
+                    "type": "TextBlock",
+                    "text": report_subhead,
+                    "wrap": True,
+                    "horizontalAlignment": "Center",
+                    "fontType": "Monospace",
+                    "size": "Medium",
+                    "weight": "Bolder",
+                },
+                {
+                    "type": "TextBlock",
+                    "text": attendance_report,
+                    "wrap": True,
+                    "horizontalAlignment": "Left",
+                    "size": "Small",
+                    "fontType": "Monospace",
+                    "weight": "Bolder",
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "ActionSet",
+                                    "actions": [
+                                        {
+                                            "type": "Action.ShowCard",
+                                            "title": "Accepted",
+                                            "card": {
+                                                "type": "AdaptiveCard",
+                                                "body": [
+                                                    {
+                                                        "type": "TextBlock",
+                                                        "text": yes_substr,
+                                                        "size": "Small",
+                                                        "wrap": False,
+                                                    }
+                                                ],
+                                            },
+                                        }
+                                    ],
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "ActionSet",
+                                    "actions": [
+                                        {
+                                            "type": "Action.ShowCard",
+                                            "title": "Declined",
+                                            "card": {
+                                                "type": "AdaptiveCard",
+                                                "body": [
+                                                    {
+                                                        "type": "TextBlock",
+                                                        "text": noes_substr,
+                                                        "size": "Small",
+                                                        "wrap": False,
+                                                    }
+                                                ],
+                                            },
+                                        }
+                                    ],
+                                }
+                            ],
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                        },
+                    ],
+                },
+            ],
+        },
+    }
+    return send_resp_card
 
 
 def pre_event_notification(prev_email, prevent_card):
@@ -1574,6 +1694,32 @@ def on_it_message(person_id):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
+def self_report(fuses_date):
+    r_up_list = []
+    r_up_dict = {}
+    r_updates_cnt = response_collection.count_documents({fuses_date: {"$exists": 1}})
+    if r_updates_cnt > 0:
+        r_updates = response_collection.find({fuses_date: {"$exists": 1}})
+        for r_up in r_updates:
+            r_up_name = r_up["pn_name"]
+            r_up_status = r_up[fuses_date]
+            r_up_dict["name"] = r_up_name
+            r_up_dict["response"] = r_up_status
+            r_up_list.append(r_up_dict.copy())
+    return r_up_list
+
+
+def self_report_sort(r_updates):
+    n_lst = []
+    y_lst = []
+    for ups in r_updates:
+        if ups["response"] == "rsvp.yes":
+            y_lst.append(ups["name"])
+        else:
+            n_lst.append(ups["name"])
+    return (y_lst, n_lst)
+
+
 if person_id in auth_mgrs:
     print("Authorized manager.")
     if msg_txt != "":
@@ -1667,11 +1813,19 @@ if action == "attend_report":
     num_none = len(no_resp)
     num_yes = len(yes_respond)
     num_no = len(declined_respond)
-    # --- Instead of doing this, pull rsvp status from Response collection
     att_rep_card = attend_report_card(
         maybe_lst, no_lst, yes_lst, fuses_date, num_none, num_yes, num_no
     )
     attend_report_msg(att_rep_card, person_id)
+    response_updates = self_report(fuses_date)
+    if len(response_updates) > 0:
+        print("Responses received")
+        print("Sort through responses")
+        self_yes, self_no = self_report_sort(response_updates)
+        srrc = self_resp_report_card(self_no, self_yes, fuses_date)
+        attend_report_msg(srrc, person_id)
+    else:
+        print("No responses")
     mgr_card(fuses_date)
 elif action == "noncomit_reminders":
     notify_emails_lst = noncomitted_reminders(no_resp)
