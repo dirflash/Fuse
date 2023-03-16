@@ -44,11 +44,11 @@ else:
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
     person_id = config["DEFAULT"]["person_id"]
-    first_name = "Bob"
-    person_name = "Bob Smith"
+    first_name = "Minh"
+    person_name = "Minh Nguyen"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "attend_report"
+    action = "rsvp.no"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -63,7 +63,7 @@ else:
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
     github_pat = config["DEFAULT"]["FUSE_PAT"]
-    rsvp_response = ""
+    rsvp_response = "[rsvp.no, 03-17-2023]"
     fuse_rsvp_date = ""
     msg_txt = ""
 
@@ -1721,14 +1721,15 @@ def self_report_sort(r_updates):
     return (y_lst, n_lst)
 
 
-if action != "rsvp.yes" or action == "rsvp.no":
-    if person_id in auth_mgrs:
-        print("Authorized manager.")
-        if msg_txt != "":
-            set_date = get_fuse_date(date_collection)
-            mgr_card(set_date)
-            kill_switch = True
-            sys.exit()
+if action != "rsvp.yes":
+    if action != "rsvp.no":
+        if person_id in auth_mgrs:
+            print("Authorized manager.")
+            if msg_txt != "":
+                set_date = get_fuse_date(date_collection)
+                mgr_card(set_date)
+                kill_switch = True
+                sys.exit()
 
 chat_id, chat_email, chat_url = chat_record(person_id)
 
