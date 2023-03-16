@@ -43,7 +43,7 @@ else:
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
-    person_id = config["DEFAULT"]["person_id"]
+    person_id = "minhngu2@cisco.com"  # config["DEFAULT"]["person_id"]
     first_name = "Minh"
     person_name = "Minh Nguyen"
     person_guid = config["DEFAULT"]["person_guid"]
@@ -1730,81 +1730,85 @@ if action != "rsvp.yes":
                 mgr_card(set_date)
                 kill_switch = True
                 sys.exit()
+        chat_id, chat_email, chat_url = chat_record(person_id)
 
-chat_id, chat_email, chat_url = chat_record(person_id)
+        try:
+            # get file attachment
+            get_attach_response = requests.request(
+                "GET", chat_url, headers=headers, timeout=3
+            )
+            get_attach_response.raise_for_status()
+            print(f"Attachment received: ({get_attach_response.status_code})")
+            cnt_disp = get_attach_response.headers.get("content-disposition")
+            if bool(cnt_disp) is True:
+                print(
+                    "'content-disposition' exists in the headers. Pulling out filename."
+                )
+                RAW_FILE_NAME = get_attach_response.headers.get("content-disposition")
+                file = RAW_FILE_NAME.split('"')[1::2]
+                file_name = file[0]
+                print(f"Attachment filename: {file_name}")
+            else:
+                print(
+                    "'content-disposition' metadata not available. Defaulting file name."
+                )
+                file_name = "csv.csv"
+        except requests.exceptions.Timeout:
+            print("Timeout error. Try again.")
+        except requests.exceptions.TooManyRedirects:
+            print("Bad URL")
+        except requests.exceptions.HTTPError as err:
+            failed_msg(person_id)
+            raise SystemExit(err) from err
+        except requests.exceptions.RequestException as cat_exception:
+            failed_msg(person_id)
+            raise SystemExit(cat_exception) from cat_exception
 
-try:
-    # get file attachment
-    get_attach_response = requests.request("GET", chat_url, headers=headers, timeout=3)
-    get_attach_response.raise_for_status()
-    print(f"Attachment received: ({get_attach_response.status_code})")
-    cnt_disp = get_attach_response.headers.get("content-disposition")
-    if bool(cnt_disp) is True:
-        print("'content-disposition' exists in the headers. Pulling out filename.")
-        RAW_FILE_NAME = get_attach_response.headers.get("content-disposition")
-        file = RAW_FILE_NAME.split('"')[1::2]
-        file_name = file[0]
-        print(f"Attachment filename: {file_name}")
-    else:
-        print("'content-disposition' metadata not available. Defaulting file name.")
-        file_name = "csv.csv"
-except requests.exceptions.Timeout:
-    print("Timeout error. Try again.")
-except requests.exceptions.TooManyRedirects:
-    print("Bad URL")
-except requests.exceptions.HTTPError as err:
-    failed_msg(person_id)
-    raise SystemExit(err) from err
-except requests.exceptions.RequestException as cat_exception:
-    failed_msg(person_id)
-    raise SystemExit(cat_exception) from cat_exception
+        try:
+            attach = get_attach_response.text
+            with open(file_name, "w", newline="\r\n", encoding="utf-8") as out:
+                out.write(attach)
+        except:
+            print("Unable to convert attachment to file.")
+            raise SystemExit()
 
-try:
-    attach = get_attach_response.text
-    with open(file_name, "w", newline="\r\n", encoding="utf-8") as out:
-        out.write(attach)
-except:
-    print("Unable to convert attachment to file.")
-    raise SystemExit()
+        try:
+            df = pd.read_csv(file_name, header=0)
+            print(df.head(2))
+        except OSError as e:
+            sys.exit("CSV file not found!")
 
-try:
-    df = pd.read_csv(file_name, header=0)
-    print(df.head(2))
-except OSError as e:
-    sys.exit("CSV file not found!")
+        print(f"Imported header names: {list(df.columns.values)}")
+        header_check(df)
 
-print(f"Imported header names: {list(df.columns.values)}")
-header_check(df)
+        df1 = alias_format(df)
+        df2 = x_dups(df1)
+        no_resp, yes_respond, declined_respond = responses(df2)
 
-df1 = alias_format(df)
-df2 = x_dups(df1)
-no_resp, yes_respond, declined_respond = responses(df2)
+        # print(f"no_resp: \n {no_resp}\n")
+        # print(f"yes_respond: \n {yes_respond}\n")
+        # print(f"declined_respond: \n {declined_respond}\n")
 
-# print(f"no_resp: \n {no_resp}\n")
-# print(f"yes_respond: \n {yes_respond}\n")
-# print(f"declined_respond: \n {declined_respond}\n")
+        print(f"Requested action: {action}")
 
+        if action != "survey_submit":
+            set_date = get_fuse_date(date_collection)
+            if set_date == "NA":
+                date_msg = f"Fuse date not set."
+                sdc = set_date_card(date_msg)
+                mgr_control(sdc)
+                print("Fuse date not set. Requested date and exited.")
+                os._exit(1)
+            else:
+                fuses_date = set_date
 
-print(f"Requested action: {action}")
-
-if action != "survey_submit":
-    set_date = get_fuse_date(date_collection)
-    if set_date == "NA":
-        date_msg = f"Fuse date not set."
-        sdc = set_date_card(date_msg)
-        mgr_control(sdc)
-        print("Fuse date not set. Requested date and exited.")
-        os._exit(1)
-    else:
-        fuses_date = set_date
-
-rsvp_ts = datetime.now()
-maybe_lst = maybe_rsvps(no_resp, rsvp_ts, fuses_date)
-no_lst = no_rsvps(declined_respond, rsvp_ts, fuses_date)
-yes_lst = yes_rsvps(yes_respond, rsvp_ts, fuses_date)
-status_records(maybe_lst, "Unknown")
-status_records(no_lst, "Declined")
-status_records(yes_lst, "Accepted")
+        rsvp_ts = datetime.now()
+        maybe_lst = maybe_rsvps(no_resp, rsvp_ts, fuses_date)
+        no_lst = no_rsvps(declined_respond, rsvp_ts, fuses_date)
+        yes_lst = yes_rsvps(yes_respond, rsvp_ts, fuses_date)
+        status_records(maybe_lst, "Unknown")
+        status_records(no_lst, "Declined")
+        status_records(yes_lst, "Accepted")
 
 print(f"Action: {action}")
 
