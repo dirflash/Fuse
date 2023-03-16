@@ -43,12 +43,12 @@ else:
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
-    person_id = config["DEFAULT"]["person_id"]
-    first_name = "Aaron"
-    person_name = "Aaron Davis"
+    person_id = "jamarsh@cisco.com"  # config["DEFAULT"]["person_id"]
+    first_name = "Jim"
+    person_name = "Jim Marsh"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = ""
+    action = "survey_msg"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -65,7 +65,7 @@ else:
     github_pat = config["DEFAULT"]["FUSE_PAT"]
     rsvp_response = ""
     fuse_rsvp_date = ""
-    msg_txt = "?"
+    msg_txt = ""
 
 
 MAX_MONGODB_DELAY = 500
@@ -1318,15 +1318,29 @@ def responses(dframe):
 
 
 def chat_record(per_id):
-    recent_chat = (
-        bridge_collection.find({"person_email": per_id}).sort("ts", DESCENDING).limit(1)
-    )
-    for _ in recent_chat:
-        doc_id = {"_id": _["_id"]}
-        doc_per_email = _["person_email"]
-        doc_attach_url = _["attachment"]  # --- Sometimes there is no attachment?
-        print(f"Found most recent request from {doc_per_email}...")
-        print(f"with attachment URL: {doc_attach_url}")
+    r_recent_cnt = bridge_collection.count_documents({"person_email": per_id})
+    if r_recent_cnt == 0:
+        last_chat = bridge_collection.find().sort("_id", -1).limit(1)
+        for x in last_chat:
+            doc_id = {"_id": x["_id"]}
+            doc_per_email = per_id
+            doc_src_email = x["person_email"]
+            doc_attach_url = x["attachment"]
+            print(f"No bridge record for {per_id}")
+            print(f"Found most recent request from {doc_src_email}...")
+            print(f"with attachment URL: {doc_attach_url}")
+    else:
+        recent_chat = (
+            bridge_collection.find({"person_email": per_id})
+            .sort("ts", DESCENDING)
+            .limit(1)
+        )
+        for _ in recent_chat:
+            doc_id = {"_id": _["_id"]}
+            doc_per_email = _["person_email"]
+            doc_attach_url = _["attachment"]
+            print(f"Found most recent request from {doc_per_email}...")
+            print(f"with attachment URL: {doc_attach_url}")
     return (doc_id, doc_per_email, doc_attach_url)
 
 
@@ -1768,7 +1782,6 @@ if action != "rsvp.yes":
                 kill_switch = True
                 sys.exit()
         chat_id, chat_email, chat_url = chat_record(person_id)
-
         try:
             # get file attachment
             get_attach_response = requests.request(
