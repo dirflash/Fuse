@@ -310,7 +310,7 @@ def mgr_control(card):
             "attachments": card,
         }
     )
-    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
+    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=3)
     return r
 
 
@@ -908,7 +908,7 @@ def attend_report_msg(ar_card, p_id):
     )
     try:
         post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+            "POST", post_msg, headers=headers, data=payload, timeout=3
         )
         post_msg_r.raise_for_status()
         anon_email = re.sub(r"\w{3}(?=@)", "xxx", p_id)
@@ -1073,7 +1073,7 @@ def pre_event_notification(prev_email, prevent_card):
     )
     try:
         post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+            "POST", post_msg, headers=headers, data=payload, timeout=3
         )
         post_msg_r.raise_for_status()
         anon_email = re.sub(r"\w{3}(?=@)", "xxx", prev_email)
@@ -1098,7 +1098,7 @@ def post_survey_msg(p_s_c, pers_id):
     )
     try:
         r = requests.request(
-            "POST", post_msg_url, headers=headers, data=payload, timeout=2
+            "POST", post_msg_url, headers=headers, data=payload, timeout=3
         )
     except requests.exceptions.Timeout:
         print("Timeout error. Try again.")
@@ -1126,7 +1126,7 @@ def send_confirmation(nc, nc_emails, no_nc, email):
         )
         try:
             post_msg_r = requests.request(
-                "POST", post_msg, headers=headers, data=payload, timeout=2
+                "POST", post_msg, headers=headers, data=payload, timeout=3
             )
             post_msg_r.raise_for_status()
             print(f"Noncommited Message sent to {nce} - ({post_msg_r.status_code})")
@@ -1226,7 +1226,7 @@ def survey_msg(s_card, email):
     )
     try:
         post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+            "POST", post_msg, headers=headers, data=payload, timeout=3
         )
         post_msg_r.raise_for_status()
         print(f"Post Event Message sent ({post_msg_r.status_code})")
@@ -1251,7 +1251,7 @@ def not_authd_mgr(email):
     )
     try:
         post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+            "POST", post_msg, headers=headers, data=payload, timeout=3
         )
         post_msg_r.raise_for_status()
         print(f"Not Authorized Manager Message sent ({post_msg_r.status_code})")
@@ -1376,7 +1376,7 @@ def failed_msg(email):
     )
     try:
         post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+            "POST", post_msg, headers=headers, data=payload, timeout=3
         )
         post_msg_r.raise_for_status()
         print(f"Failed Message sent ({post_msg_r.status_code})")
@@ -1402,7 +1402,7 @@ def proof_confirmation(email, attach_card):
     )
     try:
         post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+            "POST", post_msg, headers=headers, data=payload, timeout=3
         )
         post_msg_r.raise_for_status()
         print(f"Confirmation Message sent ({post_msg_r.status_code})")
@@ -1475,7 +1475,7 @@ def send_survey_gh(p_id, f_name, p_guid, act, sess_date, surv_url, mong_id):
     gh_webhook_url = "https://api.github.com/repos/dirflash/fuse/dispatches"
     try:
         gh_webhook_response = requests.request(
-            "POST", gh_webhook_url, headers=gh_headers, data=gh_payload, timeout=2
+            "POST", gh_webhook_url, headers=gh_headers, data=gh_payload, timeout=3
         )
         gh_webhook_response.raise_for_status()
         print(f"Confirmation Message sent ({gh_webhook_response.status_code})")
@@ -1521,7 +1521,7 @@ def send_rsvps_gh(rsvp_nameid):
     gh_webhook_url = "https://api.github.com/repos/dirflash/fuse/dispatches"
     try:
         gh_webhook_response = requests.request(
-            "POST", gh_webhook_url, headers=gh_headers, data=gh_payload, timeout=2
+            "POST", gh_webhook_url, headers=gh_headers, data=gh_payload, timeout=3
         )
         gh_webhook_response.raise_for_status()
         print(f"Confirmation Message sent ({gh_webhook_response.status_code})")
@@ -1680,7 +1680,7 @@ def on_it_message(person_id):
     on_it_payload = json.dumps({"toPersonEmail": person_id, "markdown": on_it_msg})
     try:
         on_it_note = requests.request(
-            "POST", post_msg_url, headers=headers, data=on_it_payload, timeout=2
+            "POST", post_msg_url, headers=headers, data=on_it_payload, timeout=3
         )
         on_it_note.raise_for_status()
         print(f"On it message sent ({on_it_note.status_code})")
@@ -1736,7 +1736,7 @@ chat_id, chat_email, chat_url = chat_record(person_id)
 
 try:
     # get file attachment
-    get_attach_response = requests.request("GET", chat_url, headers=headers, timeout=2)
+    get_attach_response = requests.request("GET", chat_url, headers=headers, timeout=3)
     get_attach_response.raise_for_status()
     print(f"Attachment received: ({get_attach_response.status_code})")
     cnt_disp = get_attach_response.headers.get("content-disposition")

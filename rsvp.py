@@ -175,7 +175,7 @@ def send_rsvp_msg(x_rsvp_card, x_email, x_name):
         anon_email = re.sub(pattern, "xxxx", x_email)
         print(f"Sending message to {anon_email}")
         r = requests.request(
-            "POST", post_msg_url, headers=headers, data=payload, timeout=2
+            "POST", post_msg_url, headers=headers, data=payload, timeout=3
         )
         if r.status_code == 200:
             sent_ts = datetime.now()
@@ -221,7 +221,7 @@ def failed_msg_mgr():
     )
     try:
         post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+            "POST", post_msg, headers=headers, data=payload, timeout=3
         )
         post_msg_r.raise_for_status()
         print(f"Failed Message sent ({post_msg_r.status_code})")

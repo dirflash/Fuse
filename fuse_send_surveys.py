@@ -185,7 +185,7 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
     )
     try:
         r = requests.request(
-            "POST", post_msg_url, headers=headers, data=payload, timeout=2
+            "POST", post_msg_url, headers=headers, data=payload, timeout=3
         )
         if r.status_code == 429:
             delay_header = r.headers

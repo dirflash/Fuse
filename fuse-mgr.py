@@ -65,7 +65,7 @@ def not_authd_mgr(email):
     )
     try:
         post_msg_r = requests.request(
-            "POST", post_msg, headers=headers, data=payload, timeout=2
+            "POST", post_msg, headers=headers, data=payload, timeout=3
         )
         post_msg_r.raise_for_status()
         print(f"Not Authorized Manager Message sent ({post_msg_r.status_code})")
@@ -303,15 +303,15 @@ def set_date_card():
     return setdate_card
 
 
-def mgr_control(card):
+def mgr_control(c_card, p_email):
     payload = json.dumps(
         {
-            "toPersonEmail": person_email,
+            "toPersonEmail": p_email,
             "markdown": "Adaptive card response. Open message on a supported client to respond.",
-            "attachments": card,
+            "attachments": c_card,
         }
     )
-    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=2)
+    r = requests.request("POST", post_msg_url, headers=headers, data=payload, timeout=3)
     return r
 
 
@@ -385,7 +385,7 @@ else:
 set_date = get_fuse_date(date_collection)
 if set_date == "NA":
     sdc = set_date_card()
-    mgr_control(sdc)
+    mgr_control(sdc, person_email)
     print("Fuse date not set. Requested date and exited.")
     os._exit(1)
 else:
@@ -395,4 +395,5 @@ next_date = f"Next Fuse Date: {day_fs}"
 
 card = manager_card(next_date)
 
-mgr_ctl_response = mgr_control(card)
+mgr_ctl_response = mgr_control(card, person_email)
+print(f"Manager control card sent with: {mgr_ctl_response}")
