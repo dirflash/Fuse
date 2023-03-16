@@ -24,9 +24,9 @@ jobs:
           key: ${{ hashFiles('fuse.py') }}-${{ hashFiles('requirements.txt') }}
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade requests
-          pip install -r requirements.txt
+          # python -m pip install --upgrade pip
+          # pip install --upgrade requests
+          # pip install -r requirements.txt
           if [ -f requirements.txt ]; then pip install --upgrade --upgrade-strategy eager -r requirements.txt; fi
       - name: Run fuse-mgr-respond.py
         env:
