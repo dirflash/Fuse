@@ -1894,7 +1894,7 @@ if action == "attend_report":
             print(f"No participant updates message sent ({post_msg_r.status_code})")
         except requests.exceptions.Timeout:
             print("Timeout error. Try again.")
-        mgr_card(fuses_date)
+mgr_card(fuses_date)
 elif action == "noncomit_reminders":
     notify_emails_lst = noncomitted_reminders(no_resp)
     recs = rsvp_db_upload(notify_emails_lst, fuses_date)

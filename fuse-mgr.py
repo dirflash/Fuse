@@ -86,31 +86,68 @@ def manager_card(n_date):
             "type": "AdaptiveCard",
             "body": [
                 {
-                    "type": "ColumnSet",
-                    "columns": [
+                    "type": "ImageSet",
+                    "images": [
                         {
-                            "type": "Column",
-                            "items": [
-                                {
-                                    "type": "Image",
-                                    "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
-                                    "height": "100px",
-                                    "width": "400px",
-                                }
-                            ],
+                            "type": "Image",
+                            "size": "Medium",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
+                            "height": "100px",
+                            "width": "400px",
                         }
                     ],
                 },
                 {
-                    "type": "TextBlock",
-                    "text": "Fuse Bot Mission Control",
-                    "wrap": True,
-                    "horizontalAlignment": "Center",
-                    "fontType": "Monospace",
-                    "size": "Large",
-                    "color": "Default",
-                    "weight": "Bolder",
-                    "spacing": "Small",
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "Fuse Bot Mission Control",
+                            "wrap": True,
+                            "horizontalAlignment": "Center",
+                            "fontType": "Monospace",
+                            "size": "Large",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": "What can I do for you?",
+                            "wrap": True,
+                            "horizontalAlignment": "Left",
+                            "fontType": "Monospace",
+                            "size": "Medium",
+                            "weight": "Bolder",
+                        },
+                        {
+                            "type": "Input.ChoiceSet",
+                            "choices": [
+                                {"title": "Set Date", "value": "fuse_date"},
+                                {"title": "Attendee Report", "value": "attend_report"},
+                                {
+                                    "title": "RSVP Requests",
+                                    "value": "noncomit_reminders",
+                                },
+                                {
+                                    "title": "Pre-FUSE Reminders",
+                                    "value": "pre_reminder",
+                                },
+                                {"title": "Survey Message", "value": "survey_msg"},
+                            ],
+                            "id": "Action_Choice",
+                        },
+                    ],
+                },
+                {
+                    "type": "Container",
+                    "items": [
+                        {
+                            "type": "TextBlock",
+                            "text": "First step: Set or verify the FUSE date. Then upload a CSV of calendar invite tracking data.",
+                            "wrap": True,
+                            "fontType": "Monospace",
+                            "weight": "Bolder",
+                        }
+                    ],
                 },
                 {
                     "type": "ColumnSet",
@@ -121,10 +158,11 @@ def manager_card(n_date):
                             "items": [
                                 {
                                     "type": "TextBlock",
-                                    "text": "What can I do for you?",
+                                    "text": n_date,
                                     "wrap": True,
-                                    "horizontalAlignment": "Center",
-                                    "size": "Medium",
+                                    "fontType": "Monospace",
+                                    "size": "Small",
+                                    "weight": "Bolder",
                                 }
                             ],
                         },
@@ -133,73 +171,18 @@ def manager_card(n_date):
                             "width": "stretch",
                             "items": [
                                 {
-                                    "type": "Input.ChoiceSet",
-                                    "choices": [
+                                    "type": "ActionSet",
+                                    "actions": [
                                         {
-                                            "title": "Set Date",
-                                            "value": "fuse_date",
-                                        },
-                                        {
-                                            "title": "Attendee Report",
-                                            "value": "attend_report",
-                                        },
-                                        {
-                                            "title": "Send Nudge",
-                                            "value": "noncomit_reminders",
-                                        },
-                                        {
-                                            "title": "Send Pre FUSE Reminders",
-                                            "value": "pre_reminder",
-                                        },
-                                        {
-                                            "title": "Send Survey Message",
-                                            "value": "survey_msg",
-                                        },
+                                            "type": "Action.Submit",
+                                            "title": "Submit",
+                                            "id": "submit",
+                                        }
                                     ],
-                                    "id": "Action_Choice",
+                                    "horizontalAlignment": "Right",
                                 }
                             ],
                         },
-                    ],
-                },
-                {
-                    "type": "Container",
-                    "items": [
-                        {
-                            "type": "ColumnSet",
-                            "columns": [
-                                {
-                                    "type": "Column",
-                                    "width": "stretch",
-                                    "items": [
-                                        {
-                                            "type": "TextBlock",
-                                            "text": n_date,
-                                            "horizontalAlignment": "Center",
-                                            "fontType": "Monospace",
-                                            "color": "Warning",
-                                            "wrap": True,
-                                        },
-                                    ],
-                                },
-                                {
-                                    "type": "Column",
-                                    "width": "stretch",
-                                    "items": [
-                                        {
-                                            "type": "ActionSet",
-                                            "actions": [
-                                                {
-                                                    "type": "Action.Submit",
-                                                    "title": "Submit",
-                                                }
-                                            ],
-                                            "horizontalAlignment": "Right",
-                                        }
-                                    ],
-                                },
-                            ],
-                        }
                     ],
                 },
             ],
