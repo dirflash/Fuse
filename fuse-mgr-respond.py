@@ -43,12 +43,12 @@ else:
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
-    person_id = "minhngu2@cisco.com"  # config["DEFAULT"]["person_id"]
-    first_name = "Minh"
-    person_name = "Minh Nguyen"
+    person_id = config["DEFAULT"]["person_id"]
+    first_name = "Aaron"
+    person_name = "Aaron Davis"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "rsvp.no"
+    action = "attend_report"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -63,7 +63,7 @@ else:
     mongo_pw = config["MONGO"]["MONGO_PW"]
     fuse_date = "NA"
     github_pat = config["DEFAULT"]["FUSE_PAT"]
-    rsvp_response = "[rsvp.no, 03-17-2023]"
+    rsvp_response = ""
     fuse_rsvp_date = ""
     msg_txt = ""
 
@@ -1638,7 +1638,7 @@ def yes_rsvps(yes_r, r_ts, fuse_d):
     return status_list
 
 
-def status_records(x_lst, setting):
+def status_records(x_lst, setting):  # This doesn't appear to be working correctly
     print(f"Update status records for {setting}.")
     for x in x_lst:
         name = x["name"]
@@ -1655,7 +1655,7 @@ def status_records(x_lst, setting):
             for r in r_exist:
                 if status != r["status"]:
                     r_id = r["_id"]
-                    print("Status does not match for {r_id}. Updating...")
+                    print(f"Status does not match for {r_id}. Updating...")
                     status_collection.update_one(
                         {"name": name}, {"$set": {"status": status}}
                     )
@@ -1698,12 +1698,12 @@ def on_it_message(person_id):
 def self_report(fuses_date):
     r_up_list = []
     r_up_dict = {}
-    r_updates_cnt = response_collection.count_documents({fuses_date: {"$exists": 1}})
+    r_updates_cnt = rsvp_collection.count_documents({"fuse_date": fuses_date})
     if r_updates_cnt > 0:
-        r_updates = response_collection.find({fuses_date: {"$exists": 1}})
+        r_updates = rsvp_collection.find({"fuse_date": fuses_date})
         for r_up in r_updates:
-            r_up_name = r_up["pn_name"]
-            r_up_status = r_up[fuses_date]
+            r_up_name = r_up["name"]
+            r_up_status = r_up["response"]
             r_up_dict["name"] = r_up_name
             r_up_dict["response"] = r_up_status
             r_up_list.append(r_up_dict.copy())
@@ -1716,7 +1716,7 @@ def self_report_sort(r_updates):
     for ups in r_updates:
         if ups["response"] == "rsvp.yes":
             y_lst.append(ups["name"])
-        else:
+        elif ups["response"] == "rsvp.no":
             n_lst.append(ups["name"])
     return (y_lst, n_lst)
 
