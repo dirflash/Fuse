@@ -1656,9 +1656,19 @@ def status_records(x_lst, setting):  # This doesn't appear to be working correct
                 if status != r["status"]:
                     r_id = r["_id"]
                     print(f"Status does not match for {r_id}. Updating...")
-                    status_collection.update_one(
-                        {"name": name}, {"$set": {"status": status}}
-                    )
+                    try:
+                        status_update_db = status_collection.update_one(
+                            {"name": name, "fuse_date": fuse_date},
+                            {"$set": {"status": status}},
+                        )
+                        if status_update_db.modified_count == 1:
+                            print(
+                                f"{anon_name} db record updated with new response of {status}."
+                            )
+                    except errors.OperationFailure as op_fail:
+                        print(
+                            f"status_update_db update failure ({op_fail}) for {anon_name}."
+                        )
         else:
             record = status_collection.insert_one(
                 {
@@ -1804,8 +1814,12 @@ if action != "rsvp.yes":
 
         rsvp_ts = datetime.now()
         maybe_lst = maybe_rsvps(no_resp, rsvp_ts, fuses_date)
-        no_lst = no_rsvps(declined_respond, rsvp_ts, fuses_date)
-        yes_lst = yes_rsvps(yes_respond, rsvp_ts, fuses_date)
+        no_lst = no_rsvps(
+            declined_respond, rsvp_ts, fuses_date
+        )  # -- This piece not working
+        yes_lst = yes_rsvps(
+            yes_respond, rsvp_ts, fuses_date
+        )  # -- This piece not working
         status_records(maybe_lst, "Unknown")
         status_records(no_lst, "Declined")
         status_records(yes_lst, "Accepted")
