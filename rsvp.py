@@ -36,43 +36,6 @@ else:
             "Aaron Hagen",
             "Darrell Lee",
             "Khoi Pham",
-            "Minh Nguyen",
-            "Derrick Martin",
-            "Jaime Moreno",
-            "Christopher Ronderos",
-            "Robert Jackson",
-            "Sean Huston",
-            "Eric Kalisek",
-            "Wade Vick",
-            "Buddy Mckamey",
-            "Dedra Cannon",
-            "Joe Mejica",
-            "Lester Marquez",
-            "Tung Nguyen",
-            "Nathan Larsen",
-            "Ralph Herr",
-            "Alfredo Jurado",
-            "Keegan Uchacz",
-            "Michael Lipsey",
-            "Raffi Apardian",
-            "Robert Boener",
-            "Julie Palmer",
-            "Majed Alwineyan",
-            "Mike Beller",
-            "Nick Fossen",
-            "Aaron Davis",
-            "Adam Gray",
-            "Justin Damele",
-            "Mike Nipp",
-            "Rob Routt",
-            "Kris Vassallo",
-            "Matt Okuma",
-            "Paul Gately",
-            "Randall Crumm",
-            "John Jackson",
-            "Rama Subramanian",
-            "Brian Lai",
-            "Derron Cyrus",
         ]
     )
 
@@ -202,7 +165,7 @@ def send_rsvp(s_name, s_date):
 def send_rsvp_msg(x_rsvp_card, x_email, x_name):
     payload = json.dumps(
         {
-            "toPersonEmail": "aarodavi@cisco.com",  # x_email
+            "toPersonEmail": x_email,
             "markdown": "Adaptive card response. Open message on a supported client to respond.",
             "attachments": x_rsvp_card,
         }
@@ -252,7 +215,7 @@ def failed_msg_mgr():
     )
     payload = json.dumps(
         {
-            "toPersonEmail": "aarodavi@cisco.com",  # email,
+            "toPersonEmail": "aarodavi@cisco.com",  # ---- Need to fix this to send to send to mgr
             "markdown": pl_title,
         }
     )

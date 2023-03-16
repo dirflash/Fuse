@@ -1066,7 +1066,7 @@ def pre_event_notification(prev_email, prevent_card):
     post_msg = "https://webexapis.com/v1/messages/"
     payload = json.dumps(
         {
-            "toPersonEmail": "aarodavi@cisco.com",  # prev_email,           # --- change when ready to pull the pin
+            "toPersonEmail": prev_email,
             "markdown": "Adaptive card response. Open message on a supported client to respond.",
             "attachments": prevent_card,
         }

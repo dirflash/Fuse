@@ -178,7 +178,7 @@ def send_survey_msgs(ind, per, f_name, ttl, s_date, s_url):
     # Send the test card
     payload = json.dumps(
         {
-            "toPersonEmail": "aarodavi@cisco.com",  # per,        Change this when ready to activate
+            "toPersonEmail": per,
             "markdown": "Adaptive card response. Open message on a supported client to respond.",
             "attachments": ss_card,
         }
