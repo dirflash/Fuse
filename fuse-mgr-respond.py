@@ -48,7 +48,7 @@ else:
     person_name = "Aaron Davis"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "attend_report"
+    action = ""
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -65,7 +65,7 @@ else:
     github_pat = config["DEFAULT"]["FUSE_PAT"]
     rsvp_response = ""
     fuse_rsvp_date = ""
-    msg_txt = ""
+    msg_txt = "?"
 
 
 MAX_MONGODB_DELAY = 500
@@ -1638,7 +1638,7 @@ def yes_rsvps(yes_r, r_ts, fuse_d):
     return status_list
 
 
-def status_records(x_lst, setting):  # This doesn't appear to be working correctly
+def status_records(x_lst, setting):
     print(f"Update status records for {setting}.")
     for x in x_lst:
         name = x["name"]
@@ -1731,8 +1731,35 @@ def self_report_sort(r_updates):
     return (y_lst, n_lst)
 
 
+def help_me(p_id):
+    print("Somebody has a question.")
+    herder_payload = json.dumps(
+        {
+            "toPersonEmail": p_id,
+            "markdown": "Got a question? Need to report a bot problem? Contact the bot herders [here](webexteams://im?space=7a97b910-c443-11ed-9a0a-47c2acdafc72).",
+        }
+    )
+    try:
+        post_msg_r = requests.request(
+            "POST", post_msg_url, headers=headers, data=herder_payload, timeout=3
+        )
+        post_msg_r.raise_for_status()
+        print(f"Confirmation Message sent ({post_msg_r.status_code})")
+    except requests.exceptions.Timeout:
+        print("Timeout error. Try again.")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.HTTPError as nc_err:
+        raise SystemExit(nc_err) from nc_err
+    except requests.exceptions.RequestException as nc_cat_exception:
+        raise SystemExit(nc_cat_exception) from nc_cat_exception
+
+
 if action != "rsvp.yes":
     if action != "rsvp.no":
+        if msg_txt == "?":
+            help_me(person_id)
+            sys.exit()
         if person_id in auth_mgrs:
             print("Authorized manager.")
             if msg_txt != "":
@@ -1814,12 +1841,8 @@ if action != "rsvp.yes":
 
         rsvp_ts = datetime.now()
         maybe_lst = maybe_rsvps(no_resp, rsvp_ts, fuses_date)
-        no_lst = no_rsvps(
-            declined_respond, rsvp_ts, fuses_date
-        )  # -- This piece not working
-        yes_lst = yes_rsvps(
-            yes_respond, rsvp_ts, fuses_date
-        )  # -- This piece not working
+        no_lst = no_rsvps(declined_respond, rsvp_ts, fuses_date)
+        yes_lst = yes_rsvps(yes_respond, rsvp_ts, fuses_date)
         status_records(maybe_lst, "Unknown")
         status_records(no_lst, "Declined")
         status_records(yes_lst, "Accepted")
