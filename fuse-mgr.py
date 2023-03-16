@@ -93,7 +93,7 @@ def manager_card(n_date):
                             "items": [
                                 {
                                     "type": "Image",
-                                    "url": "https://user-images.githubusercontent.com/10964629/225651805-27e85331-3af2-4564-833c-d6f741445a18.png",
+                                    "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                                     "height": "100px",
                                     "width": "400px",
                                 }
@@ -223,7 +223,7 @@ def set_date_card():
                             "type": "Image",
                             "size": "Medium",
                             "id": "fuse_image",
-                            "url": "https://user-images.githubusercontent.com/10964629/225651805-27e85331-3af2-4564-833c-d6f741445a18.png",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                         }
