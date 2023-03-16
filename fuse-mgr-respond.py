@@ -1729,10 +1729,6 @@ if action != "rsvp.yes" or action == "rsvp.no":
             mgr_card(set_date)
             kill_switch = True
             sys.exit()
-    else:
-        print("At the moment, I only accept requests from authorized managers.")
-        not_authd_mgr(person_id)
-        sys.exit()
 
 chat_id, chat_email, chat_url = chat_record(person_id)
 
