@@ -107,7 +107,7 @@ def manager_card(set_date):
                         {
                             "type": "Image",
                             "size": "Medium",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                         }
@@ -222,7 +222,7 @@ def set_date_card(date_msg):
                             "type": "Image",
                             "size": "Medium",
                             "id": "fuse_image",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                         }
@@ -325,7 +325,7 @@ def survey_submit_card():
                     "images": [
                         {
                             "type": "Image",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                             "size": "Medium",
@@ -485,7 +485,7 @@ def post_survey_card(fir_name, sess_date, surv_url):
                     "images": [
                         {
                             "type": "Image",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                             "size": "Medium",
@@ -584,7 +584,7 @@ def send_survey(s_date, s_url):
                     "images": [
                         {
                             "type": "Image",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                             "size": "Medium",
@@ -692,7 +692,7 @@ def pre_event_card(pre_name):
                         {
                             "type": "Image",
                             "size": "Medium",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                         }
@@ -770,7 +770,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                         {
                             "type": "Image",
                             "size": "Medium",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                         }
@@ -961,7 +961,7 @@ def self_resp_report_card(n_lst, y_lst, f_date):
                         {
                             "type": "Image",
                             "size": "Medium",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                         }

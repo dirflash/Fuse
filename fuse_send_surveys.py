@@ -76,7 +76,7 @@ def survey_card(fst_name, sess_date, surv_url):
                     "images": [
                         {
                             "type": "Image",
-                            "url": "https://user-images.githubusercontent.com/10964629/216710865-00ba284d-b9b1-4b8a-a8a0-9f3f07b7d962.jpg",
+                            "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
                             "size": "Medium",
