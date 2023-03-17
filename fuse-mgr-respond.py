@@ -43,12 +43,12 @@ else:
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
-    person_id = config["DEFAULT"]["person_id"]
-    first_name = "Aaron"
-    person_name = "Aaron Davis"
+    person_id = "jamarsh@cisco.com"  # config["DEFAULT"]["person_id"]
+    first_name = "Jim"
+    person_name = "Jim Marsh"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "attend_report"
+    action = "survey_submit"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -1703,15 +1703,21 @@ def help_me(p_id):
         raise SystemExit(nc_cat_exception) from nc_cat_exception
 
 
+auth_mgr_lst = []
+auth_mgrs_fix = (
+    auth_mgrs.replace("[", "").replace("]", "").replace("'", "").replace(", ", ",")
+)
+auth_mgr_lst = auth_mgrs_fix.split(",")
+
 if action != "rsvp.yes":
     if action != "rsvp.no":
         if msg_txt == "?":
             help_me(person_id)
             sys.exit()
-        if person_id in auth_mgrs:
+        if person_id in auth_mgr_lst:
             print("Authorized manager.")
+            set_date = get_fuse_date(date_collection)
             if msg_txt != "":
-                set_date = get_fuse_date(date_collection)
                 mgr_card(set_date)
                 kill_switch = True
                 sys.exit()
@@ -1776,7 +1782,7 @@ if action != "rsvp.yes":
         print(f"Requested action: {action}")
 
         if action != "survey_submit":
-            set_date = get_fuse_date(date_collection)
+            # set_date = get_fuse_date(date_collection)
             if set_date == "NA":
                 date_msg = f"Fuse date not set."
                 sdc = set_date_card(date_msg)
@@ -1787,9 +1793,9 @@ if action != "rsvp.yes":
                 fuses_date = set_date
 
         rsvp_ts = datetime.now()
-        maybe_lst = maybe_rsvps(no_resp, rsvp_ts, fuses_date)
-        no_lst = no_rsvps(declined_respond, rsvp_ts, fuses_date)
-        yes_lst = yes_rsvps(yes_respond, rsvp_ts, fuses_date)
+        maybe_lst = maybe_rsvps(no_resp, rsvp_ts, set_date)
+        no_lst = no_rsvps(declined_respond, rsvp_ts, set_date)
+        yes_lst = yes_rsvps(yes_respond, rsvp_ts, set_date)
         status_records(maybe_lst, "Unknown")
         status_records(no_lst, "Declined")
         status_records(yes_lst, "Accepted")
