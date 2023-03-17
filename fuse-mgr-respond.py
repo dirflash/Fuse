@@ -833,6 +833,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                     "title": "Declined",
                     "card": {
                         "type": "AdaptiveCard",
+                        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
                         "version": "1.2",
                         "body": [
                             {
@@ -850,6 +851,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                     "title": "Noncommitted",
                     "card": {
                         "type": "AdaptiveCard",
+                        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
                         "version": "1.2",
                         "body": [
                             {
