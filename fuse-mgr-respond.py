@@ -43,12 +43,12 @@ else:
     config = configparser.ConfigParser()
     config.read("./secrets/config.ini")
     webex_bearer = config["DEFAULT"]["webex_key"]
-    person_id = "jamarsh@cisco.com"  # config["DEFAULT"]["person_id"]
-    first_name = "Jim"
-    person_name = "Jim Marsh"
+    person_id = config["DEFAULT"]["person_id"]
+    first_name = "Aaron"
+    person_name = "Aaron Davis"
     person_guid = config["DEFAULT"]["person_guid"]
     auth_mgrs = config["DEFAULT"]["auth_mgrs"]
-    action = "survey_msg"
+    action = "attend_report"
     survey_url = "NA"
     session_date = "NA"
     mongo_addr = config["MONGO"]["MONGO_ADDR"]
@@ -807,95 +807,52 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                         },
                     ],
                 },
+            ],
+            "actions": [
                 {
-                    "type": "ColumnSet",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "items": [
-                                {
-                                    "type": "ActionSet",
-                                    "actions": [
-                                        {
-                                            "type": "Action.ShowCard",
-                                            "title": "Accepted",
-                                            "card": {
-                                                "type": "AdaptiveCard",
-                                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                                                "body": [
-                                                    {
-                                                        "type": "TextBlock",
-                                                        "text": yes_substr,
-                                                        "size": "Small",
-                                                        "wrap": True,
-                                                    }
-                                                ],
-                                            },
-                                            "id": "Accepted.ShowCard",
-                                        }
-                                    ],
-                                }
-                            ],
-                        },
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "items": [
-                                {
-                                    "type": "ActionSet",
-                                    "actions": [
-                                        {
-                                            "type": "Action.ShowCard",
-                                            "title": "Declined",
-                                            "card": {
-                                                "type": "AdaptiveCard",
-                                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                                                "body": [
-                                                    {
-                                                        "type": "TextBlock",
-                                                        "text": noes_substr,
-                                                        "size": "Small",
-                                                        "wrap": True,
-                                                    }
-                                                ],
-                                            },
-                                            "id": "Declined.ShowCard",
-                                        }
-                                    ],
-                                }
-                            ],
-                        },
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "items": [
-                                {
-                                    "type": "ActionSet",
-                                    "actions": [
-                                        {
-                                            "type": "Action.ShowCard",
-                                            "title": "Noncommitted",
-                                            "card": {
-                                                "type": "AdaptiveCard",
-                                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-                                                "body": [
-                                                    {
-                                                        "type": "TextBlock",
-                                                        "text": maybes_substr,
-                                                        "size": "Small",
-                                                        "wrap": True,
-                                                    }
-                                                ],
-                                            },
-                                            "id": "Noncom.ShowCard",
-                                        }
-                                    ],
-                                }
-                            ],
-                        },
-                    ],
-                    "id": "Noncom.ShowCard",
+                    "type": "Action.ShowCard",
+                    "title": "Accepted",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": yes_substr,
+                                "size": "Small",
+                                "wrap": True,
+                            }
+                        ],
+                    },
+                },
+                {
+                    "type": "Action.ShowCard",
+                    "title": "Declined",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": noes_substr,
+                                "size": "Small",
+                                "wrap": True,
+                            }
+                        ],
+                    },
+                },
+                {
+                    "type": "Action.ShowCard",
+                    "title": "Noncommitted",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": maybes_substr,
+                                "size": "Small",
+                                "wrap": True,
+                            }
+                        ],
+                    },
                 },
             ],
         },
@@ -1000,66 +957,37 @@ def self_resp_report_card(n_lst, y_lst, f_date):
                     "fontType": "Monospace",
                     "weight": "Bolder",
                 },
+            ],
+            "actions": [
                 {
-                    "type": "ColumnSet",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "items": [
-                                {
-                                    "type": "ActionSet",
-                                    "actions": [
-                                        {
-                                            "type": "Action.ShowCard",
-                                            "title": "Accepted",
-                                            "card": {
-                                                "type": "AdaptiveCard",
-                                                "body": [
-                                                    {
-                                                        "type": "TextBlock",
-                                                        "text": yes_substr,
-                                                        "size": "Small",
-                                                        "wrap": True,
-                                                    }
-                                                ],
-                                            },
-                                        }
-                                    ],
-                                }
-                            ],
-                        },
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "items": [
-                                {
-                                    "type": "ActionSet",
-                                    "actions": [
-                                        {
-                                            "type": "Action.ShowCard",
-                                            "title": "Declined",
-                                            "card": {
-                                                "type": "AdaptiveCard",
-                                                "body": [
-                                                    {
-                                                        "type": "TextBlock",
-                                                        "text": noes_substr,
-                                                        "size": "Small",
-                                                        "wrap": True,
-                                                    }
-                                                ],
-                                            },
-                                        }
-                                    ],
-                                }
-                            ],
-                        },
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                        },
-                    ],
+                    "type": "Action.ShowCard",
+                    "title": "Accepted",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": yes_substr,
+                                "size": "Small",
+                                "wrap": True,
+                            }
+                        ],
+                    },
+                },
+                {
+                    "type": "Action.ShowCard",
+                    "title": "Declined",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": noes_substr,
+                                "size": "Small",
+                                "wrap": True,
+                            }
+                        ],
+                    },
                 },
             ],
         },
