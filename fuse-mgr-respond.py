@@ -772,6 +772,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                             "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
+                            "size": "Medium",
                         }
                     ],
                 },
@@ -789,7 +790,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                         },
                         {
                             "type": "TextBlock",
-                            "text": report_subhead,
+                            "text": "report_subhead",
                             "wrap": True,
                             "horizontalAlignment": "Center",
                             "fontType": "Monospace",
@@ -798,7 +799,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                         },
                         {
                             "type": "TextBlock",
-                            "text": attendance_report,
+                            "text": "attendance_report",
                             "wrap": True,
                             "horizontalAlignment": "Left",
                             "fontType": "Monospace",
@@ -807,91 +808,57 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                         },
                     ],
                 },
+            ],
+            "actions": [
                 {
-                    "type": "ColumnSet",
-                    "columns": [
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "items": [
-                                {
-                                    "type": "ActionSet",
-                                    "actions": [
-                                        {
-                                            "type": "Action.ShowCard",
-                                            "title": "Accepted",
-                                            "card": {
-                                                "type": "AdaptiveCard",
-                                                "body": [
-                                                    {
-                                                        "type": "TextBlock",
-                                                        "text": yes_substr,
-                                                        "size": "Small",
-                                                        "wrap": False,
-                                                    }
-                                                ],
-                                            },
-                                            "id": "Accepted.ShowCard",
-                                        }
-                                    ],
-                                }
-                            ],
-                        },
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "items": [
-                                {
-                                    "type": "ActionSet",
-                                    "actions": [
-                                        {
-                                            "type": "Action.ShowCard",
-                                            "title": "Declined",
-                                            "card": {
-                                                "type": "AdaptiveCard",
-                                                "body": [
-                                                    {
-                                                        "type": "TextBlock",
-                                                        "text": noes_substr,
-                                                        "size": "Small",
-                                                        "wrap": False,
-                                                    }
-                                                ],
-                                            },
-                                            "id": "Declined.ShowCard",
-                                        }
-                                    ],
-                                }
-                            ],
-                        },
-                        {
-                            "type": "Column",
-                            "width": "stretch",
-                            "items": [
-                                {
-                                    "type": "ActionSet",
-                                    "actions": [
-                                        {
-                                            "type": "Action.ShowCard",
-                                            "title": "Noncommitted",
-                                            "card": {
-                                                "type": "AdaptiveCard",
-                                                "body": [
-                                                    {
-                                                        "type": "TextBlock",
-                                                        "text": maybes_substr,
-                                                        "size": "Small",
-                                                        "wrap": False,
-                                                    }
-                                                ],
-                                            },
-                                            "id": "Noncom.ShowCard",
-                                        }
-                                    ],
-                                }
-                            ],
-                        },
-                    ],
+                    "type": "Action.ShowCard",
+                    "title": "Accepted",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "version": "1.2",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": "Joe 1\nJoe 2\nJoe 3\nJoe 4\nJoe 5",
+                                "size": "Small",
+                                "wrap": False,
+                            }
+                        ],
+                    },
+                    "id": "Accepted.ShowCard",
+                },
+                {
+                    "type": "Action.ShowCard",
+                    "title": "Declined",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "version": "1.2",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": "Joe 1\nJoe 2\nJoe 3\nJoe 4\nJoe 5",
+                                "size": "Small",
+                                "wrap": False,
+                            }
+                        ],
+                    },
+                    "id": "Declined.ShowCard",
+                },
+                {
+                    "type": "Action.ShowCard",
+                    "title": "Noncommitted",
+                    "card": {
+                        "type": "AdaptiveCard",
+                        "version": "1.2",
+                        "body": [
+                            {
+                                "type": "TextBlock",
+                                "text": "Joe 1\nJoe 2\nJoe 3\nJoe 4\nJoe 5",
+                                "size": "Small",
+                                "wrap": False,
+                            }
+                        ],
+                    },
                     "id": "Noncom.ShowCard",
                 },
             ],
