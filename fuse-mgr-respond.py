@@ -819,7 +819,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                         "body": [
                             {
                                 "type": "TextBlock",
-                                "text": "Joe 1\rJoe 2\rJoe 3\rJoe 4\rJoe 5",
+                                "text": "Joe 1\n Joe 2\n Joe 3\n Joe 4\n Joe 5",
                                 "size": "Small",
                                 "wrap": False,
                             }
