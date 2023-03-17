@@ -815,13 +815,14 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                     "title": "Accepted",
                     "card": {
                         "type": "AdaptiveCard",
+                        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
                         "version": "1.2",
                         "body": [
                             {
                                 "type": "TextBlock",
                                 "text": "Joe 1\n Joe 2\n Joe 3\n Joe 4\n Joe 5",
                                 "size": "Small",
-                                "wrap": False,
+                                "wrap": True,
                             }
                         ],
                     },
