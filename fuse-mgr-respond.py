@@ -769,7 +769,6 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                     "images": [
                         {
                             "type": "Image",
-                            "size": "Medium",
                             "url": "https://user-images.githubusercontent.com/10964629/225653491-e3c2920c-419d-45ab-ba9f-b0add6138e33.png",
                             "height": "100px",
                             "width": "400px",
@@ -832,6 +831,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                                                     }
                                                 ],
                                             },
+                                            "id": "Accepted.ShowCard",
                                         }
                                     ],
                                 }
@@ -858,6 +858,7 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                                                     }
                                                 ],
                                             },
+                                            "id": "Declined.ShowCard",
                                         }
                                     ],
                                 }
@@ -884,12 +885,14 @@ def attend_report_card(m_lst, n_lst, y_lst, f_date, no_none, no_yes, no_no):
                                                     }
                                                 ],
                                             },
+                                            "id": "Noncom.ShowCard",
                                         }
                                     ],
                                 }
                             ],
                         },
                     ],
+                    "id": "Noncom.ShowCard",
                 },
             ],
         },
